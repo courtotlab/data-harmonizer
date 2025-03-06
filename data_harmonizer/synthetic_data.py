@@ -8,7 +8,9 @@ client = OpenAI(
   api_key=os.getenv('OPENAI_API_KEY')
 )
 
-def field_name_gen_openai(field_name, client=client, model_name='gpt-4o-mini', num_syn=7):
+def field_name_gen_openai(
+        field_name, client=client, model_name='gpt-4o-mini', num_syn=7
+    ) -> list[str] | None:
     prompt = f"""
     You are a helpful medical research assistant.
     
