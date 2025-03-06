@@ -11,6 +11,25 @@ client = OpenAI(
 def field_name_gen_openai(
         field_name: str, client: OpenAI = client, model_name: str = 'gpt-4o-mini', num_syn: int = 7
     ) -> list[str] | None:
+    """Generates a list of synonyms from a given field name using OpenAI
+
+    Parameters
+    ----------
+    field_name : str
+        The field name to generate synonyms for
+    client : OpenAI, optional
+        Client to connect to OpenAI, by default client
+    model_name : str, optional
+        OpenAI model to use to generate synonyms, by default 'gpt-4o-mini'
+    num_syn : int, optional
+        The number of synonyms to return, by default 7
+
+    Returns
+    -------
+    list[str] | None
+        Python list of synonyms
+    """
+
     prompt = f"""
     You are a helpful medical research assistant.
     
