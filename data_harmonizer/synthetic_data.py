@@ -113,3 +113,9 @@ def field_desc_gen_openai(
             attempt=attempt+1
 
     return result_list
+
+def main():
+    pass
+
+if __name__=="__main__":
+    main()
