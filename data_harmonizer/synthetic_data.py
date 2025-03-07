@@ -1,5 +1,6 @@
 import os
 import ast
+import pandas as pd
 from openai import OpenAI
 
 # TODO: load environment variables
@@ -115,7 +116,38 @@ def field_desc_gen_openai(
     return result_list
 
 def main():
-    pass
+    gen_func = {
+        'field_name': field_name_gen_openai,
+        'field_description': field_desc_gen_openai
+    }
+
+    # used to store synthetic data; may need to be modified if additional features are used in modelling
+    gen_data_dict = {
+        'field_name': [],
+        'field_description': [],
+        'source_field_name': []
+    }
+
+    # TODO: load data into a pandas dataframe (schema_df)
+    for row in schema_df.itertuples(index=False):
+        for gen_type in ['field_name', 'field_description']:
+            # represents the value we want to get synonyms for
+            attribute = getattr(row, gen_type)           
+
+            while True:
+                # generate synthetic data
+                gen_data = gen_func[gen_type](attribute)
+            
+                # add synthetic data to data dict
+                gen_data_dict[gen_type] = gen_data_dict[gen_type] + gen_data
+
+        # source_field_name represents the field used to generate the data
+        gen_data_dict['source_field_name'] = (
+            gen_data_dict['source_field_name'] + [getattr(row, 'field_name')]*7
+        )
+
+    synthetic = pd.DataFrame.from_dict(gen_data_dict)
+
 
 if __name__=="__main__":
     main()
