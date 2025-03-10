@@ -20,16 +20,18 @@ class HarmonizationDataset(Dataset):
         return len(self.dataframe)
 
     def __getitem__(self, idx):
-        name_1 = self.dataframe.iloc[idx, 0]
-        desc_1 = self.dataframe.iloc[idx, 1]
-        name_2 = self.dataframe.iloc[idx, 2]
-        desc_2 = self.dataframe.iloc[idx, 3]
-        label = self.dataframe.iloc[idx, 4]
+        field_name = self.dataframe.iloc[idx, 0]
+        field_desc = self.dataframe.iloc[idx, 1]
+        pos_field_name = self.dataframe.iloc[idx, 2]
+        pos_field_desc = self.dataframe.iloc[idx, 3]
+        neg_field_name = self.dataframe.iloc[idx, 4]
+        neg_field_desc = self.dataframe.iloc[idx, 5]
 
         return (
-            name_1,
-            desc_1,
-            name_2,
-            desc_2,
-            torch.tensor(label, dtype=torch.float)
+            field_name,
+            field_desc,
+            pos_field_name,
+            pos_field_desc,
+            neg_field_name,
+            neg_field_desc
         )
