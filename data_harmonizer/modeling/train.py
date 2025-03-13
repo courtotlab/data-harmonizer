@@ -34,7 +34,16 @@ class HarmonizationDataset(Dataset):
         )
     
 def main():
-    pass
+
+    # get datasets
+    train_dataset = HarmonizationDataset('../data/3_processed/train/triplet_train.csv')
+    valid_dataset = HarmonizationDataset('../data/3_processed/val/triplet_val.csv')
+    test_dataset = HarmonizationDataset('../data/3_processed/train/triplet_test.csv')
+
+    # create data loaders from data sets
+    train_loader = DataLoader(train_dataset, batch_size=512, shuffle=True)
+    valid_loader = DataLoader(valid_dataset, batch_size=512, shuffle=False)
+    test_loader = DataLoader(test_dataset, batch_size=512, shuffle=False)
 
 if __name__ == '__main__':
     main()
