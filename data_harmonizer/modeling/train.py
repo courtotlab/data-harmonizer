@@ -11,9 +11,6 @@ class HarmonizationDataset(Dataset):
     def load_data(csv_path):
         df = pd.read_csv(csv_path)
         
-        # shuffle the DataFrame rows
-        df = df.sample(frac = 1)
-        
         return df
 
     def __len__(self):
