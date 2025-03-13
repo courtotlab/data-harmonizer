@@ -32,3 +32,9 @@ class HarmonizationDataset(Dataset):
             neg_field_name,
             neg_field_desc
         )
+    
+def main():
+    pass
+
+if __name__ == '__main__':
+    main()
