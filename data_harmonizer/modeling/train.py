@@ -1,6 +1,11 @@
 import pandas as pd
 from torch.utils.data import DataLoader, Dataset
 import torch
+import torch.nn as nn
+from pathlib import Path
+import lightning as L
+
+FPATH = Path(__file__).resolve()
 
 
 class HarmonizationDataset(Dataset):
@@ -32,13 +37,94 @@ class HarmonizationDataset(Dataset):
             neg_field_name,
             neg_field_desc
         )
+
+class HarmonizationTriplet(L.LightningModule):
+    def __init__(self, base_embedding, base_dim):
+        super().__init__()
+        self.hidden_dim = 32
+        self.dropout_rate = 0.2
+        self.batch_size = 512
+        self.save_hyperparameters(ignore=['num_users', 'num_items'])
+
+        self.base_embedding = base_embedding
+        self.base_embedding.requires_grad_(False) # freeze base embedding
+        self.base_dim = base_dim # take base_size
+
+        # hidden layers
+        self.fc1 = nn.Linear(
+            2 * self.base_dim, # multiply by 2 since we use it twice (name, description)
+            self.hidden_dim
+        )
+        self.fc2 = nn.Linear(self.hidden_dim, 1)
+
+        # dropout layer
+        self.dropout = nn.Dropout(p=self.dropout_rate)
+
+        # activation function
+        self.relu = nn.ReLU()
+
+        # pairwise distance;
+        self.pdist = nn.PairwiseDistance()
+
+        # loss function
+        self.triplet_loss = nn.TripletMarginWithDistanceLoss(
+            distance_function=self.pdist
+        )
+        
+    def forward(
+            self, 
+            anchor_name, anchor_desc, 
+            pos_name, pos_desc, 
+            neg_name, neg_desc
+        ):
+
+        anchor = self.forward_once(anchor_name, anchor_desc)
+        pos = self.forward_once(pos_name, pos_desc)
+        neg = self.forward_once(neg_name, neg_desc)
+
+        return anchor, pos, neg
     
+    def forward_once(self, name, desc):
+        # TODO: include enum values
+
+        # using sentence embeddings
+        desc_embedded = torch.from_numpy(
+            self.base_embedding.encode(desc)
+        )
+        name_embedded = torch.from_numpy(
+            self.base_embedding.encode(name)
+        )
+
+        # concatenate all inputs
+        combined = torch.cat([desc_embedded, name_embedded], dim=1)
+
+        # pass through hidden layers with ReLU activation and dropout
+        x = self.relu(self.fc1(combined))
+        x = self.dropout(x)
+        output = self.fc2(x)
+
+        return output
+    
+    def training_step(self, batch, batch_idx):
+        anchor_name, anchor_desc, pos_name, pos_desc, neg_name, neg_desc = batch
+        anchor, pos, neg = self(
+            anchor_name, anchor_desc, pos_name, pos_desc, neg_name, neg_desc
+        )
+        loss = self.triplet_loss(anchor, pos, neg)
+        self.log('train_loss', loss, prog_bar=True, batch_size=self.batch_size)
+        return loss
+
+    def configure_optimizers(self):
+        return torch.optim.Adam(self.parameters(), lr=0.01)
+
 def main():
 
+    PDATA = FPATH.parent.parent.parent / 'data' / '3_processed'
+
     # get datasets
-    train_dataset = HarmonizationDataset('../data/3_processed/train/triplet_train.csv')
-    valid_dataset = HarmonizationDataset('../data/3_processed/val/triplet_val.csv')
-    test_dataset = HarmonizationDataset('../data/3_processed/train/triplet_test.csv')
+    train_dataset = HarmonizationDataset(PDATA.joinpath('train', 'triplet_train.csv'))
+    valid_dataset = HarmonizationDataset(PDATA.joinpath('val', 'triplet_val.csv'))
+    test_dataset = HarmonizationDataset(PDATA.joinpath('test', 'triplet_test.csv'))
 
     # create data loaders from data sets
     train_loader = DataLoader(train_dataset, batch_size=512, shuffle=True)
