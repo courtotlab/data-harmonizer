@@ -3,8 +3,10 @@ import ast
 import pandas as pd
 from openai import OpenAI
 
-# TODO: load environment variables
+def get_schema_features():
+    pass
 
+# TODO: load environment variables
 client = OpenAI(
   api_key=os.getenv('OPENAI_API_KEY')
 )
@@ -129,6 +131,8 @@ def main():
     }
 
     # TODO: load data into a pandas dataframe (schema_df)
+    schema_df = get_schema_features()
+
     for row in schema_df.itertuples(index=False):
         for gen_type in ['field_name', 'field_description']:
             # represents the value we want to get synonyms for
@@ -147,7 +151,6 @@ def main():
         )
 
     synthetic = pd.DataFrame.from_dict(gen_data_dict)
-
 
 if __name__=="__main__":
     main()
