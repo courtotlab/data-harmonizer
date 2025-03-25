@@ -127,7 +127,7 @@ def main():
     gen_data_dict = {
         'field_name': [],
         'field_description': [],
-        'source_field_name': []
+        'reference_field_name': []
     }
 
     # TODO: load data into a pandas dataframe (schema_df)
@@ -145,12 +145,13 @@ def main():
                 # add synthetic data to data dict
                 gen_data_dict[gen_type] = gen_data_dict[gen_type] + gen_data
 
-        # source_field_name represents the field used to generate the data
-        gen_data_dict['source_field_name'] = (
-            gen_data_dict['source_field_name'] + [getattr(row, 'field_name')]*7
+        # reference_field_name represents the field used to generate the data
+        gen_data_dict['reference_field_name'] = (
+            gen_data_dict['reference_field_name'] + [getattr(row, 'field_name')]*7
         )
 
     synthetic = pd.DataFrame.from_dict(gen_data_dict)
+    synthetic.to_csv(f'../data/2_interim/1_synthetic/synthetic_data.csv', index=False)
 
 if __name__=="__main__":
     main()
