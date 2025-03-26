@@ -25,22 +25,8 @@ def create_triplet_template(schema_df):
 
     return triplet_template
 
+def split_data(synthetic_df):
 
-def main():
-
-    schema_df = get_schema_features()
-
-    schema_df = schema_df[
-        ['field_name', 'field_description']
-    ]
-    
-    triplet_template = create_triplet_template(
-        schema_df
-    )
-
-
-    synthetic_df = pd.read_csv(interim_syn_path + synthetic_file)
-    
     dataset_lists = {
         'train': [],
         'val': [],
@@ -62,6 +48,20 @@ def main():
     dataset_dfs = {}
     for data_type in ['train', 'val', 'test']:
         dataset_dfs[data_type] = pd.concat(dataset_lists[data_type])
+
+    return dataset_dfs
+
+def main():
+
+    schema_df = get_schema_features()
+    schema_df = schema_df[
+        ['field_name', 'field_description']
+    ]
+    triplet_template = create_triplet_template(schema_df)
+
+    # split the synthetic data into a training, validation, and test set
+    synthetic_df = pd.read_csv(interim_syn_path + synthetic_file)
+    dataset_dfs = split_data(synthetic_df)
 
 if __name__=="__main__":
     main()
