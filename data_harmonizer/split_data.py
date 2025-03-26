@@ -59,6 +59,9 @@ def anc_template_join(anc_df, template_df):
 
 def main():
 
+    # create a triplet template that consists of n*2 columns
+    # where n representes the number of columns used as features
+    # and 2 represents a positive and negative examples
     schema_df = get_schema_features()
     schema_df = schema_df[
         ['field_name', 'field_description']
