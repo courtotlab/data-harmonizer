@@ -39,5 +39,25 @@ def main():
         schema_df
     )
 
+
+    synthetic_df = pd.read_csv(interim_syn_path + synthetic_file)
+    
+    dataset_lists = {
+        'train': [],
+        'val': [],
+        'test': []
+    }
+
+    for reference_field_name in synthetic_df['reference_field_name'].unique():
+        field_name_df = synthetic_df[
+            synthetic_df['reference_field_name'] == reference_field_name
+        ]
+        # one example is used for validation
+        dataset_lists['val'].append(field_name_df.iloc[[0], :])
+        # one example is used for testing
+        dataset_lists['test'].append(field_name_df.iloc[[1], :])
+        # remainaing data (i.e. 7-2=5) will be used as training data
+        dataset_lists['train'].append(field_name_df.iloc[2:, :])
+
 if __name__=="__main__":
     main()
