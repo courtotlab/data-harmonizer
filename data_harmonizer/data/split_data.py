@@ -1,7 +1,7 @@
 import pandas as pd
 import itertools
 
-def create_triplet_template(schema_df):
+def create_triplet_template(schema_df: pd.DataFrame) -> pd.DataFrame:
     
     # list all combinations of 2 items each
     unique_field_name_combos = list(itertools.combinations(
@@ -25,7 +25,7 @@ def create_triplet_template(schema_df):
 
     return triplet_template
 
-def split_data(synthetic_df):
+def split_data(synthetic_df: pd.DataFrame) -> pd.DataFrame:
 
     dataset_lists = {
         'train': [],
@@ -51,7 +51,9 @@ def split_data(synthetic_df):
 
     return dataset_dfs
 
-def anc_template_join(anc_df, template_df):
+def anc_template_join(
+    anc_df: pd.DataFrame, template_df: pd.DataFrame
+) -> pd.DataFrame:
     result = pd.merge(
         anc_df, template_df, how='inner', on='pos_field_name'
     )
