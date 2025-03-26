@@ -51,6 +51,12 @@ def split_data(synthetic_df):
 
     return dataset_dfs
 
+def anc_template_join(anc_df, template_df):
+    result = pd.merge(
+        anc_df, template_df, how='inner', on='pos_field_name'
+    )
+    return result
+
 def main():
 
     schema_df = get_schema_features()
@@ -60,8 +66,25 @@ def main():
     triplet_template = create_triplet_template(schema_df)
 
     # split the synthetic data into a training, validation, and test set
-    synthetic_df = pd.read_csv(interim_syn_path + synthetic_file)
+    # TODO: add path to synthetic data
+    synthetic_df = pd.read_csv()
     dataset_dfs = split_data(synthetic_df)
+
+    # for each data set, combine with the triplet_template to create 
+    # triplet data set and save
+    for data_type in ['train', 'val', 'test']:
+        data_type_df = dataset_dfs[data_type]
+
+        # combine synthetic data with triplet_template
+        triplet_data_type = data_type_df.apply(
+            lambda row: anc_template_join(row.to_frame().T, triplet_template), axis=1
+        )
+        triplet_data_type_df = pd.concat(list(triplet_data_type))
+
+        triplet_data_type_df.to_csv(
+            '../data/3_processed/' + data_type + '/triplet_' + data_type + '.csv', 
+            index=False
+        )
 
 if __name__=="__main__":
     main()
