@@ -2,6 +2,7 @@ import os
 import ast
 import pandas as pd
 from openai import OpenAI
+import time
 
 def get_schema_features():
     pass
@@ -144,6 +145,9 @@ def main():
             
                 # add synthetic data to data dict
                 gen_data_dict[gen_type] = gen_data_dict[gen_type] + gen_data
+
+                time.sleep(20)
+                break
 
         # reference_field_name represents the field used to generate the data
         gen_data_dict['reference_field_name'] = (
