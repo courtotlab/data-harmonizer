@@ -26,7 +26,6 @@ def create_triplet_template(schema_df):
     return triplet_template
 
 
-
 def main():
 
     schema_df = get_schema_features()
@@ -58,6 +57,11 @@ def main():
         dataset_lists['test'].append(field_name_df.iloc[[1], :])
         # remainaing data (i.e. 7-2=5) will be used as training data
         dataset_lists['train'].append(field_name_df.iloc[2:, :])
+
+    # convert lists to dataframes
+    dataset_dfs = {}
+    for data_type in ['train', 'val', 'test']:
+        dataset_dfs[data_type] = pd.concat(dataset_lists[data_type])
 
 if __name__=="__main__":
     main()
