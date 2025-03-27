@@ -87,7 +87,7 @@ def split_data(synthetic_df: pd.DataFrame) -> dict[str, pd.DataFrame]:
     return dataset_dict
 
 def create_triplet_df(
-    triplet_template: pd.DataFrame, synthetic_data: pd.DataFrame
+    triplet_template: pd.DataFrame, synthetic_df: pd.DataFrame
 ) -> pd.DataFrame:
     
     def anc_template_join(
@@ -99,7 +99,7 @@ def create_triplet_df(
         return result
     
     # combine synthetic data with triplet_template
-    triplet_row = synthetic_data.apply(
+    triplet_row = synthetic_df.apply(
         lambda row: anc_template_join(row.to_frame().T, triplet_template), axis=1
     )
     triplet_df = pd.concat(list(triplet_row))
