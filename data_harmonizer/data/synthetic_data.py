@@ -55,13 +55,15 @@ def field_name_gen_openai(
     )
 
     attempt=1
+    result_list = None
     while attempt<=5:
         try:
-            result_list = ast.literal_eval(
+            result_list_attempt = ast.literal_eval(
                 completion.choices[0].message.content
             )
             
             if len(result_list) == num_syn:
+                result_list = result_list_attempt
                 break
             else:
                 attempt=attempt+1
@@ -112,13 +114,15 @@ def field_desc_gen_openai(
     )
 
     attempt=1
+    result_list = None
     while attempt<=5:
         try:
-            result_list = ast.literal_eval(
+            result_list_attempt = ast.literal_eval(
                 completion.choices[0].message.content
             )
             
-            if len(result_list) == num_syn:
+            if len(result_list_attempt) == num_syn:
+                result_list = result_list_attempt
                 break
             else:
                 attempt=attempt+1
