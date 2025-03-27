@@ -51,13 +51,25 @@ def split_data(synthetic_df: pd.DataFrame) -> pd.DataFrame:
 
     return dataset_dfs
 
-def anc_template_join(
-    anc_df: pd.DataFrame, template_df: pd.DataFrame
+def create_triplet_df(
+    triplet_template: pd.DataFrame, synthetic_data: pd.DataFrame
 ) -> pd.DataFrame:
-    result = pd.merge(
-        anc_df, template_df, how='inner', on='pos_field_name'
+    
+    def anc_template_join(
+        anc_df: pd.DataFrame, template_df: pd.DataFrame
+    ) -> pd.DataFrame:
+        result = pd.merge(
+            anc_df, template_df, how='inner', on='pos_field_name'
+        )
+        return result
+    
+    # combine synthetic data with triplet_template
+    triplet_row = synthetic_data.apply(
+        lambda row: anc_template_join(row.to_frame().T, triplet_template), axis=1
     )
-    return result
+    triplet_df = pd.concat(list(triplet_row))
+
+    return triplet_df
 
 def main():
 
@@ -80,11 +92,7 @@ def main():
     for data_type in ['train', 'val', 'test']:
         data_type_df = dataset_dfs[data_type]
 
-        # combine synthetic data with triplet_template
-        triplet_data_type = data_type_df.apply(
-            lambda row: anc_template_join(row.to_frame().T, triplet_template), axis=1
-        )
-        triplet_data_type_df = pd.concat(list(triplet_data_type))
+        triplet_data_type_df = create_triplet_df(triplet_template, data_type_df)
 
         triplet_data_type_df.to_csv(
             '../data/3_processed/' + data_type + '/triplet_' + data_type + '.csv', 
