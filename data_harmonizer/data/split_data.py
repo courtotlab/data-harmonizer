@@ -25,7 +25,7 @@ def create_triplet_template(schema_df: pd.DataFrame) -> pd.DataFrame:
 
     return triplet_template
 
-def split_data(synthetic_df: pd.DataFrame) -> pd.DataFrame:
+def split_data(synthetic_df: pd.DataFrame) -> dict[str, pd.DataFrame]:
 
     dataset_lists = {
         'train': [],
