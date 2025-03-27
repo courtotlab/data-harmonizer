@@ -2,6 +2,24 @@ import pandas as pd
 import itertools
 
 def create_triplet_template(schema_df: pd.DataFrame) -> pd.DataFrame:
+    """Create template that will be used downstream to create a triplet dataset
+
+    Parameters
+    ----------
+    schema_df : pd.DataFrame
+        Dataframe containing schema information (e.g. field name, field description). Each 
+        column in this dataframe will be considered a feature of the field and will be 
+        used downstream to create the triplet data set.
+
+    Returns
+    -------
+    pd.DataFrame
+        Datafame containing all permutations of two fields (and associated feature columns) 
+        from the schema dataframe. The two fields represent a positive point (similar to the anchor) 
+        and a negative point (different to the anchor). The returned dataframe should contain
+        n*2 columns where n represents the number of feature columns (i.e. columns in the schema 
+        dataframe), and 2 represents a positive and negative point.
+    """
     
     # list all permutations of 2 items each
     unique_field_name_perms = list(itertools.permutations(
@@ -10,6 +28,7 @@ def create_triplet_template(schema_df: pd.DataFrame) -> pd.DataFrame:
 
     pos = []
     neg = []
+    # using the permutations, add rows to the pos and neg lists
     for unique_field_name_perm in unique_field_name_perms:
         pos.append(schema_df[
             schema_df['field_name'] == unique_field_name_perm[0]
@@ -18,9 +37,11 @@ def create_triplet_template(schema_df: pd.DataFrame) -> pd.DataFrame:
             schema_df['field_name'] == unique_field_name_perm[1]
         ])
 
+    # concatenate lists and rename columns to create a dataframe
     pos_df = pd.concat(pos).add_prefix('pos_').reset_index(drop=True)
     neg_df = pd.concat(neg).add_prefix('neg_').reset_index(drop=True)
 
+    # create the template by concatenating the positive and negative df
     triplet_template = pd.concat([pos_df, neg_df], axis=1)
 
     return triplet_template
