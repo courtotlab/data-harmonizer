@@ -48,7 +48,7 @@ def create_triplet_template(schema_df: pd.DataFrame) -> pd.DataFrame:
 
 def split_data(synthetic_df: pd.DataFrame) -> dict[str, pd.DataFrame]:
 
-    dataset_lists = {
+    dataset_dict = {
         'train': [],
         'val': [],
         'test': []
@@ -59,18 +59,17 @@ def split_data(synthetic_df: pd.DataFrame) -> dict[str, pd.DataFrame]:
             synthetic_df['reference_field_name'] == reference_field_name
         ]
         # one example is used for validation
-        dataset_lists['val'].append(field_name_df.iloc[[0], :])
+        dataset_dict['val'].append(field_name_df.iloc[[0], :])
         # one example is used for testing
-        dataset_lists['test'].append(field_name_df.iloc[[1], :])
+        dataset_dict['test'].append(field_name_df.iloc[[1], :])
         # remainaing data (i.e. 7-2=5) will be used as training data
-        dataset_lists['train'].append(field_name_df.iloc[2:, :])
+        dataset_dict['train'].append(field_name_df.iloc[2:, :])
 
     # convert lists to dataframes
-    dataset_dfs = {}
     for data_type in ['train', 'val', 'test']:
-        dataset_dfs[data_type] = pd.concat(dataset_lists[data_type])
+        dataset_dict[data_type] = pd.concat(dataset_dict[data_type])
 
-    return dataset_dfs
+    return dataset_dict
 
 def create_triplet_df(
     triplet_template: pd.DataFrame, synthetic_data: pd.DataFrame
@@ -106,12 +105,12 @@ def main():
     # split the synthetic data into a training, validation, and test set
     # TODO: add path to synthetic data
     synthetic_df = pd.read_csv()
-    dataset_dfs = split_data(synthetic_df)
+    dataset_dict = split_data(synthetic_df)
 
     # for each data set, combine with the triplet_template to create 
     # triplet data set and save
     for data_type in ['train', 'val', 'test']:
-        data_type_df = dataset_dfs[data_type]
+        data_type_df = dataset_dict[data_type]
 
         triplet_data_type_df = create_triplet_df(triplet_template, data_type_df)
 
