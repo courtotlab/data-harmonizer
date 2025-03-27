@@ -89,6 +89,9 @@ def split_data(synthetic_df: pd.DataFrame) -> dict[str, pd.DataFrame]:
 def create_triplet_df(
     synthetic_df: pd.DataFrame, triplet_template: pd.DataFrame
 ) -> pd.DataFrame:
+    synthetic_df = synthetic_df.rename(
+        columns={'reference_field_name': 'pos_field_name'}
+    )
     
     def anc_template_join(
         anc_df: pd.DataFrame, template_df: pd.DataFrame
