@@ -47,6 +47,21 @@ def create_triplet_template(schema_df: pd.DataFrame) -> pd.DataFrame:
     return triplet_template
 
 def split_data(synthetic_df: pd.DataFrame) -> dict[str, pd.DataFrame]:
+    """Split synthetic data into a train, validate, and test set
+
+    Parameters
+    ----------
+    synthetic_df : pd.DataFrame
+        Dataframe containing synthetic data in the feature columns (e.g. field_name, 
+        field_description) and a 'relative_field_name' indicating where the synthetic 
+        field data was from. There should be multiple examples for each 'relative_field_name'.
+
+    Returns
+    -------
+    dict[str, pd.DataFrame]
+        Dictionary with keys for 'train', 'val', and 'tests'. The value for each key is a 
+        dataframe that was split from the synthetic data.
+    """
 
     dataset_dict = {
         'train': [],
