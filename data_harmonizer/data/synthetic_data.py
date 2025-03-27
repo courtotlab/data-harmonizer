@@ -3,11 +3,13 @@ import ast
 import pandas as pd
 from openai import OpenAI
 import time
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def get_schema_features():
     pass
 
-# TODO: load environment variables
 client = OpenAI(
   api_key=os.getenv('OPENAI_API_KEY')
 )
