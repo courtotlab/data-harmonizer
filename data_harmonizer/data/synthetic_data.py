@@ -55,7 +55,6 @@ def field_name_gen_openai(
     attempt=1
     while attempt<=5:
         try:
-            completion.choices[0].message.content
             result_list = ast.literal_eval(
                 completion.choices[0].message.content
             )
@@ -108,7 +107,6 @@ def field_desc_gen_openai(
     attempt=1
     while attempt<=5:
         try:
-            completion.choices[0].message.content
             result_list = ast.literal_eval(
                 completion.choices[0].message.content
             )
