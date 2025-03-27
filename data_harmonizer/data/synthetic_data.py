@@ -60,7 +60,12 @@ def field_name_gen_openai(
             result_list = ast.literal_eval(
                 completion.choices[0].message.content
             )
-            break
+            
+            if len(result_list) == num_syn:
+                break
+            else:
+                attempt=attempt+1
+        
         except:
             attempt=attempt+1
 
@@ -112,7 +117,12 @@ def field_desc_gen_openai(
             result_list = ast.literal_eval(
                 completion.choices[0].message.content
             )
-            break
+            
+            if len(result_list) == num_syn:
+                break
+            else:
+                attempt=attempt+1
+        
         except:
             attempt=attempt+1
 
