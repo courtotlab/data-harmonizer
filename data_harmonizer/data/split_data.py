@@ -87,7 +87,7 @@ def split_data(synthetic_df: pd.DataFrame) -> dict[str, pd.DataFrame]:
     return dataset_dict
 
 def create_triplet_df(
-    triplet_template: pd.DataFrame, synthetic_df: pd.DataFrame
+    synthetic_df: pd.DataFrame, triplet_template: pd.DataFrame
 ) -> pd.DataFrame:
     
     def anc_template_join(
@@ -127,7 +127,7 @@ def main():
     for data_type in ['train', 'val', 'test']:
         data_type_df = dataset_dict[data_type]
 
-        triplet_data_type_df = create_triplet_df(triplet_template, data_type_df)
+        triplet_data_type_df = create_triplet_df(data_type_df, triplet_template)
 
         triplet_data_type_df.to_csv(
             '../data/3_processed/' + data_type + '/triplet_' + data_type + '.csv', 
