@@ -37,6 +37,29 @@ param_create_triplet_template = [
                 
             }
         )
+    ),
+    ( # multiple feature columns
+        pd.DataFrame(
+            {
+                'field_name': ['field_name_1', 'field_name_2'],
+                'feature_A': ['feature_A_1', 'feature_A_2'],
+                'feature_B': ['feature_B_1', 'feature_B_2'],
+                'feature_C': ['feature_C_1', 'feature_C_2'],
+            }
+        ),
+
+        pd.DataFrame(
+            {
+                'pos_field_name': ['field_name_1', 'field_name_2'],
+                'pos_feature_A': ['feature_A_1', 'feature_A_2'],
+                'pos_feature_B': ['feature_B_1', 'feature_B_2'],
+                'pos_feature_C': ['feature_C_1', 'feature_C_2'],
+                'neg_field_name': ['field_name_2', 'field_name_1'],
+                'neg_feature_A': ['feature_A_2', 'feature_A_1'],
+                'neg_feature_B': ['feature_B_2', 'feature_B_1'],
+                'neg_feature_C': ['feature_C_2', 'feature_C_1']
+            }
+        )
     )
 ]
 
