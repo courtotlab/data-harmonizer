@@ -53,25 +53,8 @@ def field_name_gen_openai(
             {'role': 'user', 'content': prompt}
         ]
     )
-
-    attempt=1
-    result_list = None
-    while attempt<=5:
-        try:
-            result_list_attempt = ast.literal_eval(
-                completion.choices[0].message.content
-            )
-            
-            if len(result_list) == num_syn:
-                result_list = result_list_attempt
-                break
-            else:
-                attempt=attempt+1
-        
-        except:
-            attempt=attempt+1
-
-    return result_list
+    
+    return completion.choices[0].message.content
 
 def field_desc_gen_openai(
         field_desc: str, client: OpenAI = client, model_name: str = 'gpt-4o-mini', num_syn: int = 7
@@ -113,12 +96,15 @@ def field_desc_gen_openai(
         ]
     )
 
+    return completion.choices[0].message.content
+
+def retry_gen_data(llm_call, attribute, num_syn=7, num_retries=5):
     attempt=1
     result_list = None
-    while attempt<=5:
+    while attempt<=num_retries:
         try:
             result_list_attempt = ast.literal_eval(
-                completion.choices[0].message.content
+                llm_call(attribute, num_syn)
             )
             
             if len(result_list_attempt) == num_syn:
@@ -155,7 +141,7 @@ def main():
 
             while True:
                 # generate synthetic data
-                gen_data = gen_func[gen_type](attribute)
+                gen_data = retry_gen_data(gen_func[gen_type], attribute)
             
                 # add synthetic data to data dict
                 gen_data_dict[gen_type] = gen_data_dict[gen_type] + gen_data
