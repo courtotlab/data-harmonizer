@@ -89,6 +89,30 @@ def split_data(synthetic_df: pd.DataFrame) -> dict[str, pd.DataFrame]:
 def create_triplet_df(
     synthetic_df: pd.DataFrame, triplet_template: pd.DataFrame
 ) -> pd.DataFrame:
+    """Creates triplet data set by merging synthetic data and triplet template
+
+    Parameters
+    ----------
+    synthetic_df : pd.DataFrame
+        Synthetic data containing all feature columns (e.g. field_name, field_description)
+    triplet_template : pd.DataFrame
+        Datafame containing all permutations of two fields (and associated feature columns) 
+        from the schema dataframe. The two fields represent a positive point (similar to the anchor) 
+        and a negative point (different to the anchor). The returned dataframe should contain
+        n*2 columns where n represents the number of feature columns (i.e. columns in the schema 
+        dataframe), and 2 represents a positive and negative point.
+
+    Returns
+    -------
+    pd.DataFrame
+        Dataframe containing the triplet data (i.e. anchor, positive, negative) and associated 
+        feature columns. The number of columns should be n*3 where n is the number of feature 
+        columns.
+
+    See Also
+    --------
+    create_triplet_template
+    """
     synthetic_df = synthetic_df.rename(
         columns={'reference_field_name': 'pos_field_name'}
     )
