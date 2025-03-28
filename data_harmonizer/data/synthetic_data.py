@@ -131,28 +131,44 @@ def main():
         'reference_field_name': []
     }
 
+    field_features = ['field_name', 'field_description']
+
     # TODO: load data into a pandas dataframe (schema_df)
     schema_df = get_schema_features()
 
     for row in schema_df.itertuples(index=False):
-        for gen_type in ['field_name', 'field_description']:
+        
+        row_gen_data_dict = {}
+        for field_feature in field_features:
             # represents the value we want to get synonyms for
-            attribute = getattr(row, gen_type)           
-
-            while True:
-                # generate synthetic data
-                gen_data = retry_gen_data(gen_func[gen_type], attribute)
+            attribute = getattr(row, field_feature)           
             
-                # add synthetic data to data dict
-                gen_data_dict[gen_type] = gen_data_dict[gen_type] + gen_data
+            gen_data = retry_gen_data(gen_func[field_feature], attribute)
 
-                time.sleep(20)
+            # if generating data for a feature fails, we don't need to 
+            # try generating other features
+            if gen_data is None:
+                row_gen_data_dict = {}
                 break
+            else:
+                row_gen_data_dict[field_feature] = gen_data
 
-        # reference_field_name represents the field used to generate the data
-        gen_data_dict['reference_field_name'] = (
-            gen_data_dict['reference_field_name'] + [getattr(row, 'field_name')]*7
-        )
+        if len(row_gen_data_dict) == len(field_features):        
+            
+            for key, val in row_gen_data_dict.values:
+                # add synthetic data to data dict
+                gen_data_dict[key] = (
+                    gen_data_dict[key] + val
+                )
+
+            # reference_field_name represents the field used to generate the data
+            gen_data_dict['reference_field_name'] = (
+                gen_data_dict['reference_field_name'] + [getattr(row, 'field_name')]*7
+            )
+
+        # TODO: log issue with generating data
+        else:
+            pass
 
     synthetic = pd.DataFrame.from_dict(gen_data_dict)
     synthetic.to_csv(f'../data/2_interim/1_synthetic/synthetic_data.csv', index=False)
