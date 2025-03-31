@@ -120,7 +120,6 @@ def retry_gen_data(
         Returns a list of strings with a length of num_syn. If the function cannot create a list of strings with num_syn strings within num_retries, None is returned.
     """
     attempt=1
-    result_list = None
     while attempt<=num_retries:
         try:
             # attempt to turn the string of a list into a literal list
@@ -129,15 +128,14 @@ def retry_gen_data(
             )
             
             if len(result_list_attempt) == num_syn:
-                result_list = result_list_attempt
-                break
+                return result_list_attempt
             else:
                 attempt=attempt+1
         
         except:
             attempt=attempt+1
 
-    return result_list
+    return None
 
 def main():
     gen_func = {
