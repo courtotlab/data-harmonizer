@@ -163,16 +163,18 @@ def main():
         'field_description': field_desc_gen_openai
     }
 
-    # used to store synthetic data; may need to be modified if additional features are used in modelling
+    # used to store synthetic data based on features in gen_func
     gen_data_dict = {
-        'field_name': [],
-        'field_description': [],
         'reference_field_name': []
     }
+    for key in gen_func.keys():
+        gen_data_dict[key] = []
 
+    # get target schema info which is used to generate synthetic data
     schema_df = get_schema_features()
-
     for row in schema_df.itertuples(index=False):
+        # generate synonyms for a single row in the data frame and 
+        # store synthetic data inside a dictionary
         gen_row_data_dict = get_gen_row_data_dict(row, gen_func)
 
         # proceed if data is correctly generated
