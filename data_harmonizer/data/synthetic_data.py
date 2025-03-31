@@ -99,7 +99,7 @@ def field_desc_gen_openai(
 
 def retry_gen_data(
     llm_call: Callable[[str, OpenAI, str, int], list[str] | None:], 
-    feature: str, num_syn: int = 7, num_retries: int = 5
+    attribute: str, num_syn: int = 7, num_retries: int = 5
 ) -> list[str] | None:
     """Retry to generate synthetic data
 
@@ -107,7 +107,7 @@ def retry_gen_data(
     ----------
     llm_call : function
         LLM function, specific to the field feature, used to generate the synonyms
-    feature : str
+    attribute : str
         The field feature that needs synonyms generated
     num_syn : int, optional
         The expected number of synonyms generated for the field feature, by default 7
@@ -124,7 +124,7 @@ def retry_gen_data(
         try:
             # attempt to turn the string of a list into a literal list
             result_list_attempt = ast.literal_eval(
-                llm_call(feature, num_syn)
+                llm_call(attribute, num_syn)
             )
             
             if len(result_list_attempt) == num_syn:
@@ -136,6 +136,26 @@ def retry_gen_data(
             attempt=attempt+1
 
     return None
+
+def get_gen_row_data_dict(row, gen_func):
+
+    gen_row_data_dict = {}
+    for field_feature in list(gen_func.keys()):
+        # represents the value we want to get synonyms for
+        attribute = getattr(row, field_feature)           
+        
+        gen_data = retry_gen_data(gen_func[field_feature], attribute)
+
+        # if generating data for a feature fails, we don't need to 
+        # try generating other features
+        if gen_data is None:
+            gen_row_data_dict = {}
+            break
+        else:
+            gen_row_data_dict[field_feature] = gen_data
+
+    return gen_row_data_dict
+
 
 def main():
     gen_func = {
@@ -150,29 +170,13 @@ def main():
         'reference_field_name': []
     }
 
-    field_features = ['field_name', 'field_description']
-
     schema_df = get_schema_features()
 
     for row in schema_df.itertuples(index=False):
-        
-        gen_row_data_dict = {}
-        for field_feature in field_features:
-            # represents the value we want to get synonyms for
-            attribute = getattr(row, field_feature)           
-            
-            gen_data = retry_gen_data(gen_func[field_feature], attribute)
-
-            # if generating data for a feature fails, we don't need to 
-            # try generating other features
-            if gen_data is None:
-                gen_row_data_dict = {}
-                break
-            else:
-                gen_row_data_dict[field_feature] = gen_data
+        gen_row_data_dict = get_gen_row_data_dict(row, gen_func)
 
         # proceed if data is correctly generated
-        if len(gen_row_data_dict) == len(field_features):        
+        if len(gen_row_data_dict) == len(gen_func.keys()):        
             
             for key, val in gen_row_data_dict.values:
                 # add synthetic data to data dict
