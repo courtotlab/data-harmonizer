@@ -1,5 +1,6 @@
 import pandas as pd
 import itertools
+from schema_data import get_schema_features
 
 def create_triplet_template(schema_df: pd.DataFrame) -> pd.DataFrame:
     """Create template that will be used downstream to create a triplet dataset
