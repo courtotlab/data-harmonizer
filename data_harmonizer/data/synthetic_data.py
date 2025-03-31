@@ -5,6 +5,7 @@ from openai import OpenAI
 import time
 from dotenv import load_dotenv
 from data_harmonizer.data.schema_data import get_schema_features
+from collections.abc import Callable
 
 load_dotenv()
 
@@ -97,7 +98,8 @@ def field_desc_gen_openai(
     return completion.choices[0].message.content
 
 def retry_gen_data(
-    llm_call: function, feature: str, num_syn: int = 7, num_retries: int = 5
+    llm_call: Callable[[str, OpenAI, str, int], list[str] | None:], 
+    feature: str, num_syn: int = 7, num_retries: int = 5
 ) -> list[str] | None:
     """Retry to generate synthetic data
 
