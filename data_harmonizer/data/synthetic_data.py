@@ -152,7 +152,6 @@ def main():
 
     field_features = ['field_name', 'field_description']
 
-    # TODO: load data into a pandas dataframe (schema_df)
     schema_df = get_schema_features()
 
     for row in schema_df.itertuples(index=False):
