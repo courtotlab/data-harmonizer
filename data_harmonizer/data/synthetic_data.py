@@ -136,7 +136,7 @@ def main():
 
     for row in schema_df.itertuples(index=False):
         
-        row_gen_data_dict = {}
+        gen_row_data_dict = {}
         for field_feature in field_features:
             # represents the value we want to get synonyms for
             attribute = getattr(row, field_feature)           
@@ -146,14 +146,15 @@ def main():
             # if generating data for a feature fails, we don't need to 
             # try generating other features
             if gen_data is None:
-                row_gen_data_dict = {}
+                gen_row_data_dict = {}
                 break
             else:
-                row_gen_data_dict[field_feature] = gen_data
+                gen_row_data_dict[field_feature] = gen_data
 
-        if len(row_gen_data_dict) == len(field_features):        
+        # proceed if data is correctly generated
+        if len(gen_row_data_dict) == len(field_features):        
             
-            for key, val in row_gen_data_dict.values:
+            for key, val in gen_row_data_dict.values:
                 # add synthetic data to data dict
                 gen_data_dict[key] = (
                     gen_data_dict[key] + val
