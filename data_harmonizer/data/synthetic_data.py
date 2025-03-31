@@ -96,13 +96,34 @@ def field_desc_gen_openai(
 
     return completion.choices[0].message.content
 
-def retry_gen_data(llm_call, attribute, num_syn=7, num_retries=5):
+def retry_gen_data(
+    llm_call: function, feature: str, num_syn: int = 7, num_retries: int = 5
+) -> list[str] | None:
+    """Retry to generate synthetic data
+
+    Parameters
+    ----------
+    llm_call : function
+        LLM function, specific to the field feature, used to generate the synonyms
+    feature : str
+        The field feature that needs synonyms generated
+    num_syn : int, optional
+        The expected number of synonyms generated for the field feature, by default 7
+    num_retries : int, optional
+        The number of retries before the function gives up, by default 5
+
+    Returns
+    -------
+    list[str] | None
+        Returns a list of strings with a length of num_syn. If the function cannot create a list of strings with num_syn strings within num_retries, None is returned.
+    """
     attempt=1
     result_list = None
     while attempt<=num_retries:
         try:
+            # attempt to turn the string of a list into a literal list
             result_list_attempt = ast.literal_eval(
-                llm_call(attribute, num_syn)
+                llm_call(feature, num_syn)
             )
             
             if len(result_list_attempt) == num_syn:
