@@ -2,7 +2,6 @@ import os
 import ast
 import pandas as pd
 from openai import OpenAI
-import time
 from dotenv import load_dotenv
 from data_harmonizer.data.schema_data import get_schema_features
 from collections.abc import Callable
