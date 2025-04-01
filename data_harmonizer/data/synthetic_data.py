@@ -14,7 +14,7 @@ client = OpenAI(
 
 def field_name_gen_openai(
         field_name: str, client: OpenAI = client, model_name: str = 'gpt-4o-mini', num_syn: int = 7
-    ) -> list[str] | None:
+    ) -> str | None:
     """Generates a list of synonyms from a given field name using OpenAI
 
     Parameters
@@ -30,8 +30,8 @@ def field_name_gen_openai(
 
     Returns
     -------
-    list[str] | None
-        Python list of synonyms
+    str | None
+        Python string representation of a list
     """
 
     prompt = f"""
@@ -56,7 +56,7 @@ def field_name_gen_openai(
 
 def field_desc_gen_openai(
         field_desc: str, client: OpenAI = client, model_name: str = 'gpt-4o-mini', num_syn: int = 7
-    ) -> list[str] | None:
+    ) -> str | None:
     """Generates a list of synonyms from a given field descriptions using OpenAI
 
     Parameters
@@ -72,8 +72,8 @@ def field_desc_gen_openai(
 
     Returns
     -------
-    list[str] | None
-        Python list of synonyms
+    str | None
+        Python string representation of a list
     """
 
     prompt = f"""
