@@ -7,6 +7,21 @@ param_retry_gen_data = [
         '["test"]',
         1,
         ["test"]
+    ),
+    (
+        '["test", "test", "test"]',
+        3,
+        ["test", "test", "test"]
+    ),
+    (
+        '["test"]',
+        3,
+        None
+    ),
+    (
+        '["test""]',
+        1,
+        None
     )
 ]
 
