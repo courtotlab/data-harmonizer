@@ -117,7 +117,9 @@ def retry_gen_data(
     Returns
     -------
     list[str] | None
-        Returns a list of strings with a length of num_syn. If the function cannot create a list of strings with num_syn strings within num_retries, None is returned.
+        Returns a list of strings with a length of num_syn. If the function 
+        cannot create a list of strings with num_syn strings within 
+        num_retries, None is returned.
     """
     attempt=1
     while attempt<=num_retries:
@@ -137,7 +139,29 @@ def retry_gen_data(
 
     return None
 
-def get_gen_row_data_dict(row, gen_func):
+def get_gen_row_data_dict(
+    row: tuple, gen_func: dict[str, Callable]
+) -> dict[str, list[str]]:
+    """Get the generated data for a single row of the dataframe
+
+    Parameters
+    ----------
+    row : tuple
+        Features which we want to generate synonyms for
+    gen_func : dict[str, Callable]
+        Dictionary where the key represents the feature and 
+        the value represents the function used to generate the synonyms
+
+    Returns
+    -------
+    dict[str, list[str]]
+        Dictionary where the key represents the feature and 
+        the value represents list of strings represents the generated synonyms
+
+    See Also
+    --------
+    retry_gen_data
+    """
 
     gen_row_data_dict = {}
     for field_feature in list(gen_func.keys()):
