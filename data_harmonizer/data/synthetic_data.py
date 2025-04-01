@@ -1,3 +1,9 @@
+"""Generate synthetic data from schema features
+
+Given a dataframe that contains schema features, this module will create synonyms for each of the features using OpenAI. The synonyms will be used to train a neural network.
+
+"""
+
 import os
 import ast
 import pandas as pd
