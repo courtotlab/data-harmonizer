@@ -27,7 +27,7 @@ def create_triplet_template(schema_df: pd.DataFrame) -> pd.DataFrame:
         n*2 columns where n represents the number of feature columns (i.e. columns in the schema 
         dataframe), and 2 represents a positive and negative point.
     """
-    
+
     # list all permutations of 2 items each
     unique_field_name_perms = list(itertools.permutations(
         schema_df['field_name'], 2
@@ -123,7 +123,7 @@ def create_triplet_df(
     synthetic_df = synthetic_df.rename(
         columns={'reference_field_name': 'pos_field_name'}
     )
-    
+
     def anc_template_join(
         anc_df: pd.DataFrame, template_df: pd.DataFrame
     ) -> pd.DataFrame:
@@ -131,7 +131,7 @@ def create_triplet_df(
             anc_df, template_df, how='inner', on='pos_field_name'
         )
         return result
-    
+
     # combine synthetic data with triplet_template
     triplet_row = synthetic_df.apply(
         lambda row: anc_template_join(row.to_frame().T, triplet_template), axis=1
@@ -156,7 +156,7 @@ def main():
     synthetic_df = pd.read_csv()
     dataset_dict = split_data(synthetic_df)
 
-    # for each data set, combine with the triplet_template to create 
+    # for each data set, combine with the triplet_template to create
     # triplet data set and save
     for data_type in ['train', 'val', 'test']:
         data_type_df = dataset_dict[data_type]
