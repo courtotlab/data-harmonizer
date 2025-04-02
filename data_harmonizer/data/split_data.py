@@ -1,3 +1,9 @@
+"""Create data sets for use in neural network training
+
+This script organizes the previously created synthetic data into a triplet data set and divides the data into data sets used for training the neural network.
+
+"""
+
 import pandas as pd
 import itertools
 from data_harmonizer.data.schema_data import get_schema_features
