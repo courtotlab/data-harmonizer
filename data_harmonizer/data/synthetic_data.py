@@ -6,11 +6,11 @@ Given a dataframe that contains schema features, this module will create synonym
 
 import os
 import ast
+from collections.abc import Callable
 import pandas as pd
 from openai import OpenAI
 from dotenv import load_dotenv
 from data_harmonizer.data.schema_data import get_schema_features
-from collections.abc import Callable
 
 load_dotenv()
 
