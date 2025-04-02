@@ -1,6 +1,7 @@
 """Create data sets for use in neural network training
 
-This script organizes the previously created synthetic data into a triplet data set and divides the data into data sets used for training the neural network.
+This script organizes the previously created synthetic data into a triplet data
+set and divides the data into data sets used for training the neural network.
 
 """
 
