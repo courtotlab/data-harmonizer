@@ -4,8 +4,8 @@ This script organizes the previously created synthetic data into a triplet data 
 
 """
 
-import pandas as pd
 import itertools
+import pandas as pd
 from data_harmonizer.data.schema_data import get_schema_features
 
 def create_triplet_template(schema_df: pd.DataFrame) -> pd.DataFrame:
