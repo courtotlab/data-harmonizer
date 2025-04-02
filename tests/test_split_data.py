@@ -35,8 +35,7 @@ param_create_triplet_template = [
                     'field_description_2', 'field_description_3',
                     'field_description_1', 'field_description_3',
                     'field_description_1', 'field_description_2'
-                ],
-                
+                ]
             }
         )
     ),
@@ -179,8 +178,7 @@ param_create_triplet_df = [
                 ],
                 'neg_field_description': [
                     'field_description_7', 'field_description_8'
-                ],
-                
+                ]
             }
         ),
         pd.DataFrame(
