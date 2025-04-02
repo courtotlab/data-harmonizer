@@ -1,3 +1,5 @@
+"""Tests for data_harmonizer.data.split_data"""
+
 import pytest
 import pandas as pd
 from data_harmonizer.data.split_data import create_triplet_template, split_data, create_triplet_df
