@@ -19,7 +19,7 @@ client = OpenAI(
 )
 
 def field_name_gen_openai(
-    field_name: str, client: OpenAI = client, 
+    field_name: str, client: OpenAI = client,
     model_name: str = 'gpt-4o-mini', num_syn: int = 7
 ) -> str | None:
     """Generates a list of synonyms from a given field name using OpenAI
@@ -58,11 +58,11 @@ def field_name_gen_openai(
             {'role': 'user', 'content': prompt}
         ]
     )
-    
+
     return completion.choices[0].message.content
 
 def field_desc_gen_openai(
-    field_desc: str, client: OpenAI = client, 
+    field_desc: str, client: OpenAI = client,
     model_name: str = 'gpt-4o-mini', num_syn: int = 7
 ) -> str | None:
     """Generates a list of synonyms from a given field descriptions using OpenAI
@@ -105,7 +105,7 @@ def field_desc_gen_openai(
     return completion.choices[0].message.content
 
 def retry_gen_data(
-    llm_call: Callable[[str, OpenAI, str, int], list[str] | None:], 
+    llm_call: Callable[[str, OpenAI, str, int], list[str] | None],
     attribute: str, num_syn: int = 7, num_retries: int = 5
 ) -> list[str] | None:
     """Retry to generate synthetic data
@@ -135,12 +135,12 @@ def retry_gen_data(
             result_list_attempt = ast.literal_eval(
                 llm_call(attribute, num_syn)
             )
-            
+
             if len(result_list_attempt) == num_syn:
                 return result_list_attempt
             else:
                 attempt=attempt+1
-        
+
         except:
             attempt=attempt+1
 
@@ -173,11 +173,11 @@ def get_gen_row_data_dict(
     gen_row_data_dict = {}
     for field_feature in list(gen_func.keys()):
         # represents the value we want to get synonyms for
-        attribute = getattr(row, field_feature)           
-        
+        attribute = getattr(row, field_feature)
+
         gen_data = retry_gen_data(gen_func[field_feature], attribute)
 
-        # if generating data for a feature fails, we don't need to 
+        # if generating data for a feature fails, we don't need to
         # try generating other features
         if gen_data is None:
             gen_row_data_dict = {}
@@ -204,13 +204,13 @@ def main():
     # get target schema info which is used to generate synthetic data
     schema_df = get_schema_features()
     for row in schema_df.itertuples(index=False):
-        # generate synonyms for a single row in the data frame and 
+        # generate synonyms for a single row in the data frame and
         # store synthetic data inside a dictionary
         gen_row_data_dict = get_gen_row_data_dict(row, gen_func)
 
         # proceed if data is correctly generated
-        if len(gen_row_data_dict) == len(gen_func.keys()):        
-            
+        if len(gen_row_data_dict) == len(gen_func.keys()):
+
             for key, val in gen_row_data_dict.values:
                 # add synthetic data to data dict
                 gen_data_dict[key] = (
