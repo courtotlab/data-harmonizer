@@ -227,7 +227,7 @@ def main():
             pass
 
     synthetic = pd.DataFrame.from_dict(gen_data_dict)
-    synthetic.to_csv(f'../data/2_interim/1_synthetic/synthetic_data.csv', index=False)
+    synthetic.to_csv('../data/2_interim/1_synthetic/synthetic_data.csv', index=False)
 
 if __name__=="__main__":
     main()
