@@ -1,6 +1,8 @@
 """Generate synthetic data from schema features
 
-Given a dataframe that contains schema features, this module will create synonyms for each of the features using OpenAI. The synonyms will be used to train a neural network.
+Given a dataframe that contains schema features, this module will create
+synonyms for each of the features using OpenAI. The synonyms will be
+used to train a neural network.
 
 """
 
@@ -44,7 +46,10 @@ def field_name_gen_openai(
     prompt = f"""
     You are a helpful medical research assistant.
     
-    Create {num_syn} wholly unique field names, formatted in either snake case and camel case, to be used in a clinical data set that are synonymous with the given field name. Return the result as a list of strings without comments. Exclude the given field name in the list.
+    Create {num_syn} wholly unique field names, formatted in either snake
+    case and camel case, to be used in a clinical data set that are synonymous
+    with the given field name. Return the result as a list of strings without
+    comments. Exclude the given field name in the list.
 
     <<<
     Field name: {field_name}
@@ -87,7 +92,10 @@ def field_desc_gen_openai(
     prompt = f"""
     You are a helpful medical research assistant.
 
-    Create {num_syn} unique field descriptions, of 2-3 sentences each, to be used in a clinical data set that are synonymous with the given field description. Return the result as a list of strings without comments. Exclude the given field description in the list.
+    Create {num_syn} unique field descriptions, of 2-3 sentences each, to be
+    used in a clinical data set that are synonymous with the given field
+    description. Return the result as a list of strings without comments.
+    Exclude the given field description in the list.
 
     <<<
     Field description: {field_desc}
