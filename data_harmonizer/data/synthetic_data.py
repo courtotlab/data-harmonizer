@@ -141,7 +141,7 @@ def retry_gen_data(
         try:
             # attempt to turn the string of a list into a literal list
             result_list_attempt = ast.literal_eval(
-                llm_call(attribute, num_syn)
+                llm_call(attribute, num_syn=num_syn)
             )
 
             if len(result_list_attempt) == num_syn:
