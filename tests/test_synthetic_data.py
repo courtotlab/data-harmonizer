@@ -2,7 +2,6 @@
 
 import collections
 import pytest
-from _pytest.monkeypatch import monkeypatch
 import data_harmonizer
 from data_harmonizer.data.synthetic_data import retry_gen_data, get_gen_row_data_dict
 
@@ -68,7 +67,6 @@ param_get_gen_row_data_dict= [
 ]
 
 @pytest.mark.parametrize(
-    #'tuple_dict_2, gen_func_dict_2, patch_retry_gen_data_2, expected_dict_2',
     'tuple_dict_2, patch_retry_gen_data_2, expected_dict_2', 
     param_get_gen_row_data_dict
 )
