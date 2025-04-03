@@ -1,11 +1,9 @@
+import os
 import pandas as pd
 from torch.utils.data import DataLoader, Dataset
 import torch
 import torch.nn as nn
-from pathlib import Path
 import lightning as L
-
-FPATH = Path(__file__).resolve()
 
 
 class HarmonizationDataset(Dataset):
@@ -119,12 +117,19 @@ class HarmonizationTriplet(L.LightningModule):
 
 def main():
 
-    PDATA = FPATH.parent.parent.parent / 'data' / '3_processed'
-
     # get datasets
-    train_dataset = HarmonizationDataset(PDATA.joinpath('train', 'triplet_train.csv'))
-    valid_dataset = HarmonizationDataset(PDATA.joinpath('val', 'triplet_val.csv'))
-    test_dataset = HarmonizationDataset(PDATA.joinpath('test', 'triplet_test.csv'))
+    processed_path = os.path.abspath(os.path.join(
+        os.path.dirname( __file__ ), '..', '..', 'data', '3_processed'
+    ))
+    train_dataset = HarmonizationDataset(
+        os.path.join(processed_path, 'triplet_train.csv')
+    )
+    valid_dataset = HarmonizationDataset(
+        os.path.join(processed_path, 'triplet_val.csv')
+    )
+    test_dataset = HarmonizationDataset(
+        os.path.join(processed_path, 'triplet_test.csv')
+    )
 
     # create data loaders from data sets
     train_loader = DataLoader(train_dataset, batch_size=512, shuffle=True)
