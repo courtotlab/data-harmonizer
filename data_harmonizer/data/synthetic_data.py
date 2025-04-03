@@ -219,7 +219,7 @@ def main():
         # proceed if data is correctly generated
         if len(gen_row_data_dict) == len(gen_func.keys()):
 
-            for key, val in gen_row_data_dict.values():
+            for key, val in gen_row_data_dict.items():
                 # add synthetic data to data dict
                 gen_data_dict[key] = (
                     gen_data_dict[key] + val
