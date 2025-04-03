@@ -9,11 +9,12 @@ def get_schema_features():
     schema_df = pd.DataFrame(
         {
             'field_name': [
-                'field_name_1', 'field_name_2', 'field_name_3'
+                'program_id', 'gender', 'date_of_birth'
             ],
             'field_description': [
-                'field_description_1', 'field_description_2', 
-                'field_description_3'
+                'Unique identifier of the program.', 
+                'Description of the donor self-reported gender. Gender is described as the assemblage of properties that distinguish people on the basis of their societal roles.', 
+                "Indicate donor's date of birth."
             ]
         }
     )
