@@ -13,7 +13,11 @@ def get_schema_features():
             ],
             'field_description': [
                 'Unique identifier of the program.', 
-                'Description of the donor self-reported gender. Gender is described as the assemblage of properties that distinguish people on the basis of their societal roles.', 
+                (
+                    'Description of the donor self-reported gender. Gender is '
+                    'described as the assemblage of properties that '
+                    'distinguish people on the basis of their societal roles.'
+                ),
                 "Indicate donor's date of birth."
             ]
         }
