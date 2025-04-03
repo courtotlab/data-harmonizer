@@ -16,12 +16,12 @@ from data_harmonizer.data.schema_data import get_schema_features
 
 load_dotenv()
 
-client = OpenAI(
+CLIENT = OpenAI(
   api_key=os.getenv('OPENAI_API_KEY')
 )
 
 def field_name_gen_openai(
-    field_name: str, client: OpenAI = client,
+    field_name: str, client: OpenAI = CLIENT,
     model_name: str = 'gpt-4o-mini', num_syn: int = 7
 ) -> str | None:
     """Generates a list of synonyms from a given field name using OpenAI
@@ -67,7 +67,7 @@ def field_name_gen_openai(
     return completion.choices[0].message.content
 
 def field_desc_gen_openai(
-    field_desc: str, client: OpenAI = client,
+    field_desc: str, client: OpenAI = CLIENT,
     model_name: str = 'gpt-4o-mini', num_syn: int = 7
 ) -> str | None:
     """Generates a list of synonyms from a given field descriptions using OpenAI
