@@ -111,6 +111,24 @@ class HarmonizationTriplet(L.LightningModule):
         loss = self.triplet_loss(anchor, pos, neg)
         self.log('train_loss', loss, prog_bar=True, batch_size=self.batch_size)
         return loss
+    
+    def validation_step(self, batch, batch_idx):
+        anchor_name, anchor_desc, pos_name, pos_desc, neg_name, neg_desc = batch
+        anchor, pos, neg = self(
+            anchor_name, anchor_desc, pos_name, pos_desc, neg_name, neg_desc
+        )
+        loss = self.triplet_loss(anchor, pos, neg)
+        self.log('val_loss', loss, prog_bar=True, batch_size=self.batch_size)
+        return loss
+    
+    def test_step(self, batch, batch_idx):
+        anchor_name, anchor_desc, pos_name, pos_desc, neg_name, neg_desc = batch
+        anchor, pos, neg = self(
+            anchor_name, anchor_desc, pos_name, pos_desc, neg_name, neg_desc
+        )
+        loss = self.triplet_loss(anchor, pos, neg)
+        self.log('test_loss', loss, prog_bar=True, batch_size=self.batch_size)
+        return loss
 
     def configure_optimizers(self):
         return torch.optim.Adam(self.parameters(), lr=0.01)
