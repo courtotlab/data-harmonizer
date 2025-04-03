@@ -42,7 +42,7 @@ class HarmonizationTriplet(L.LightningModule):
         self.hidden_dim = 32
         self.dropout_rate = 0.2
         self.batch_size = 512
-        self.save_hyperparameters(ignore=['num_users', 'num_items'])
+        self.save_hyperparameters()
 
         self.base_embedding = base_embedding
         self.base_embedding.requires_grad_(False) # freeze base embedding
