@@ -11,11 +11,11 @@ FPATH = Path(__file__).resolve()
 class HarmonizationDataset(Dataset):
     def __init__(self, csv_path, dataframe=None):
         self.dataframe = dataframe or self.load_data(csv_path)
-    
+
     @staticmethod
     def load_data(csv_path):
         df = pd.read_csv(csv_path)
-        
+
         return df
 
     def __len__(self):
@@ -70,11 +70,11 @@ class HarmonizationTriplet(L.LightningModule):
         self.triplet_loss = nn.TripletMarginWithDistanceLoss(
             distance_function=self.pdist
         )
-        
+
     def forward(
-            self, 
-            anchor_name, anchor_desc, 
-            pos_name, pos_desc, 
+            self,
+            anchor_name, anchor_desc,
+            pos_name, pos_desc,
             neg_name, neg_desc
         ):
 
@@ -83,7 +83,7 @@ class HarmonizationTriplet(L.LightningModule):
         neg = self.forward_once(neg_name, neg_desc)
 
         return anchor, pos, neg
-    
+
     def forward_once(self, name, desc):
         # TODO: include enum values
 
@@ -104,7 +104,7 @@ class HarmonizationTriplet(L.LightningModule):
         output = self.fc2(x)
 
         return output
-    
+
     def training_step(self, batch, batch_idx):
         anchor_name, anchor_desc, pos_name, pos_desc, neg_name, neg_desc = batch
         anchor, pos, neg = self(
