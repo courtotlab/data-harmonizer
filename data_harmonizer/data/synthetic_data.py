@@ -235,7 +235,10 @@ def main():
             pass
 
     synthetic = pd.DataFrame.from_dict(gen_data_dict)
-    synthetic.to_csv('../data/2_interim/1_synthetic/synthetic_data.csv', index=False)
+    save_path = os.path.abspath(os.path.join(
+        os.path.dirname( __file__ ), '..', '..', 'data', '2_interim', 'synthetic_data.csv'
+    ))
+    synthetic.to_csv(save_path, index=False)
 
 if __name__=="__main__":
     main()
