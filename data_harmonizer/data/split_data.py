@@ -5,6 +5,7 @@ set and divides the data into data sets used for training the neural network.
 
 """
 
+import os
 import itertools
 import pandas as pd
 from data_harmonizer.data.schema_data import get_schema_features
@@ -153,8 +154,10 @@ def main():
     triplet_template = create_triplet_template(schema_df)
 
     # split the synthetic data into a training, validation, and test set
-    # TODO: add path to synthetic data
-    synthetic_df = pd.read_csv()
+    synthetic_path = os.path.abspath(os.path.join(
+        os.path.dirname( __file__ ), '..', '..', 'data', '2_interim', 'synthetic_data.csv'
+    ))
+    synthetic_df = pd.read_csv(synthetic_path)
     dataset_dict = split_data(synthetic_df)
 
     # for each data set, combine with the triplet_template to create
@@ -164,10 +167,11 @@ def main():
 
         triplet_data_type_df = create_triplet_df(data_type_df, triplet_template)
 
-        triplet_data_type_df.to_csv(
-            '../data/3_processed/' + data_type + '/triplet_' + data_type + '.csv', 
-            index=False
-        )
+        save_path = os.path.abspath(os.path.join(
+            os.path.dirname( __file__ ), '..', '..', 'data', '3_processed',
+            'triplet_' + data_type + '.csv'
+        ))
+        triplet_data_type_df.to_csv(save_path, index=False)
 
 if __name__=="__main__":
     main()
