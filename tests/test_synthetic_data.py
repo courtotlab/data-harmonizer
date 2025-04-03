@@ -1,3 +1,5 @@
+"""Tests for data_harmonizer.data.synthetic_data"""
+
 import collections
 import pytest
 from _pytest.monkeypatch import monkeypatch
@@ -81,7 +83,7 @@ def test_get_gen_row_data_dict(
 
     monkeypatch.setattr(
         data_harmonizer.data.synthetic_data, 'retry_gen_data',
-        lambda x, y: patch_retry_gen_data_2[y]
+        lambda _, y: patch_retry_gen_data_2[y]
     )
 
     actual = get_gen_row_data_dict(p, tuple_dict_2)
