@@ -4,6 +4,7 @@ from torch.utils.data import DataLoader, Dataset
 import torch
 import torch.nn as nn
 import lightning as L
+from lightning.pytorch.loggers import CSVLogger
 from lightning.pytorch.callbacks import EarlyStopping, ModelCheckpoint
 
 
@@ -167,7 +168,13 @@ def main():
     trainer = L.Trainer(
         max_epochs=100,
         callbacks=callbacks,
-        accelerator="cpu"
+        accelerator="cpu",
+        logger=CSVLogger(
+            save_dir=os.path.abspath(os.path.join(
+                os.path.dirname( __file__ ), '..', '..', 'models', 'logs'
+            )), name='tnn'
+        ),
+        log_every_n_steps=5
     )
 
 if __name__ == '__main__':
