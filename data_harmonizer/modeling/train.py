@@ -4,6 +4,7 @@ from torch.utils.data import DataLoader, Dataset
 import torch
 import torch.nn as nn
 import lightning as L
+from sentence_transformers import SentenceTransformer
 from lightning.pytorch.loggers import CSVLogger
 from lightning.pytorch.callbacks import EarlyStopping, ModelCheckpoint
 
@@ -163,6 +164,10 @@ def main():
     callbacks = [
         early_stop_callback, model_checkpoint_callback
     ]
+
+    # use sentence transformers for embedding
+    base_embedding = SentenceTransformer("all-MiniLM-L6-v2")
+    base_dim = base_embedding.get_sentence_embedding_dimension()
 
     # configure trainer
     trainer = L.Trainer(
