@@ -4,6 +4,7 @@ from torch.utils.data import DataLoader, Dataset
 import torch
 import torch.nn as nn
 import lightning as L
+from lightning.pytorch.callbacks import EarlyStopping, ModelCheckpoint
 
 
 class HarmonizationDataset(Dataset):
@@ -150,6 +151,17 @@ def main():
     train_loader = DataLoader(train_dataset, batch_size=512, shuffle=True)
     valid_loader = DataLoader(valid_dataset, batch_size=512, shuffle=False)
     test_loader = DataLoader(test_dataset, batch_size=512, shuffle=False)
+
+    # define callbacks
+    early_stop_callback = EarlyStopping(
+        monitor="val_loss", min_delta=0.00, patience=5, verbose=False, mode="min"
+    )
+    model_checkpoint_callback = ModelCheckpoint(
+        save_top_k=1, mode="min", monitor="val_loss", save_last=True
+    )
+    callbacks = [
+        early_stop_callback, model_checkpoint_callback
+    ]
 
 if __name__ == '__main__':
     main()
