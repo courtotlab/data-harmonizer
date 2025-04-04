@@ -163,5 +163,12 @@ def main():
         early_stop_callback, model_checkpoint_callback
     ]
 
+    # configure trainer
+    trainer = L.Trainer(
+        max_epochs=100,
+        callbacks=callbacks,
+        accelerator="cpu"
+    )
+
 if __name__ == '__main__':
     main()
