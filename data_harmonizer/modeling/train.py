@@ -16,7 +16,6 @@ class HarmonizationDataset(Dataset):
     @staticmethod
     def load_data(csv_path):
         df = pd.read_csv(csv_path)
-
         return df
 
     def __len__(self):
@@ -187,6 +186,9 @@ def main():
 
     # train using data
     trainer.fit(model, train_loader, valid_loader)
+
+    # test the model
+    trainer.test(model, dataloaders=test_loader)
 
 if __name__ == '__main__':
     main()
