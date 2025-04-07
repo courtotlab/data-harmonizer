@@ -169,6 +169,9 @@ def main():
     base_embedding = SentenceTransformer("all-MiniLM-L6-v2")
     base_dim = base_embedding.get_sentence_embedding_dimension()
 
+    # define the model
+    model = HarmonizationTriplet(base_embedding, base_dim)
+
     # configure trainer
     trainer = L.Trainer(
         max_epochs=100,
@@ -181,6 +184,9 @@ def main():
         ),
         log_every_n_steps=5
     )
+
+    # train using data
+    trainer.fit(model, train_loader, valid_loader)
 
 if __name__ == '__main__':
     main()
