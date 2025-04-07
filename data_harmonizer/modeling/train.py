@@ -194,7 +194,9 @@ def main():
     # once training is done, move the model
     shutil.move(
         model_checkpoint_callback.best_model_path,
-        '../../models/tnn_final.ckpt'
+        os.path.abspath(os.path.join(
+            os.path.dirname( __file__ ), '..', '..', 'models', 'tnn_final.ckpt'
+        ))
     )
 
 if __name__ == '__main__':
