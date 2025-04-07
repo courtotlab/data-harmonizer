@@ -7,6 +7,7 @@ import lightning as L
 from sentence_transformers import SentenceTransformer
 from lightning.pytorch.loggers import CSVLogger
 from lightning.pytorch.callbacks import EarlyStopping, ModelCheckpoint
+import shutil
 
 
 class HarmonizationDataset(Dataset):
@@ -189,6 +190,12 @@ def main():
 
     # test the model
     trainer.test(model, dataloaders=test_loader)
+
+    # once training is done, move the model
+    shutil.move(
+        model_checkpoint_callback.best_model_path,
+        '../../models/tnn_final.ckpt'
+    )
 
 if __name__ == '__main__':
     main()
