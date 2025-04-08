@@ -46,7 +46,7 @@ def field_name_gen_openai(
     prompt = f"""
     You are a helpful medical research assistant.
     
-    Create {num_syn} wholly unique field names, formatted in either snake
+    Create {num_syn} wholly unique field names, formatted in snake
     case and camel case, to be used in a clinical data set that are synonymous
     with the given field name. Return the result as a Python list of strings
     without comments. Exclude the given field name in the list.
