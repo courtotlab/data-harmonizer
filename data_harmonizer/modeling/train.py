@@ -1,4 +1,5 @@
 import os
+import shutil
 import pandas as pd
 from torch.utils.data import DataLoader, Dataset
 import torch
@@ -7,7 +8,6 @@ import lightning as L
 from sentence_transformers import SentenceTransformer
 from lightning.pytorch.loggers import CSVLogger
 from lightning.pytorch.callbacks import EarlyStopping, ModelCheckpoint
-import shutil
 
 
 class HarmonizationDataset(Dataset):
