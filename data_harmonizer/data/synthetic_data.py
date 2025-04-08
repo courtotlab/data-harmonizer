@@ -144,7 +144,8 @@ def retry_gen_data(
                 llm_call(attribute, num_syn=num_syn)
             )
 
-            if len(result_list_attempt) == num_syn:
+            if len(result_list_attempt) >= num_syn:
+                result_list_attempt = result_list_attempt[:num_syn]
                 return result_list_attempt
             else:
                 attempt=attempt+1
