@@ -1,3 +1,11 @@
+"""Train a Triplet Neural Network
+
+This module with train a Triplet Neural Network using the previously generated
+synonyms data set. Therefore, the model will be customized to the target
+schema.
+
+"""
+
 import os
 import shutil
 import pandas as pd
