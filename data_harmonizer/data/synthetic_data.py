@@ -48,8 +48,8 @@ def field_name_gen_openai(
     
     Create {num_syn} wholly unique field names, formatted in either snake
     case and camel case, to be used in a clinical data set that are synonymous
-    with the given field name. Return the result as a list of strings without
-    comments. Exclude the given field name in the list.
+    with the given field name. Return the result as a Python list of strings
+    without comments. Exclude the given field name in the list.
 
     <<<
     Field name: {field_name}
@@ -94,8 +94,8 @@ def field_desc_gen_openai(
 
     Create {num_syn} unique field descriptions, of 2-3 sentences each, to be
     used in a clinical data set that are synonymous with the given field
-    description. Return the result as a list of strings without comments.
-    Exclude the given field description in the list.
+    description. Return the result as a Python list of strings without
+    comments. Exclude the given field description in the list.
 
     <<<
     Field description: {field_desc}
