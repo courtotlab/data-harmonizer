@@ -20,6 +20,8 @@ CLIENT = OpenAI(
   api_key=os.getenv('OPENAI_API_KEY')
 )
 
+TARGET_LINKML_PATH = os.getenv('TARGET_LINKML_PATH')
+
 def field_name_gen_openai(
     field_name: str, client: OpenAI = CLIENT,
     model_name: str = 'gpt-4o-mini', num_syn: int = 7
@@ -211,7 +213,9 @@ def main():
         gen_data_dict[key] = []
 
     # get target schema info which is used to generate synthetic data
-    schema_df = get_schema_features()
+    schema_df = get_schema_features(os.path.abspath(
+        os.path.join(os.path.dirname( __file__ ), '..', '..', TARGET_LINKML_PATH)
+    ))
     for row in schema_df.itertuples(index=False):
         # generate synonyms for a single row in the data frame and
         # store synthetic data inside a dictionary
