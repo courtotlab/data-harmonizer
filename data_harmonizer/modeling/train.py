@@ -53,6 +53,7 @@ class HarmonizationTriplet(L.LightningModule):
         self.hidden_dim = 32
         self.dropout_rate = 0.2
         self.batch_size = 512
+        # save parameters for review
         self.save_hyperparameters()
 
         self.base_embedding = base_embedding
@@ -94,9 +95,10 @@ class HarmonizationTriplet(L.LightningModule):
         return anchor, pos, neg
 
     def forward_once(self, name, desc):
+        """Create a single vector for each point"""
         # TODO: include enum values
 
-        # using sentence embeddings
+        # using sentence embeddings for description and name
         desc_embedded = torch.from_numpy(
             self.base_embedding.encode(desc)
         )
@@ -115,6 +117,7 @@ class HarmonizationTriplet(L.LightningModule):
         return output
 
     def _shared_step(self, batch):
+        """Logic shared between all steps"""
         anchor_name, anchor_desc, pos_name, pos_desc, neg_name, neg_desc = batch
         anchor, pos, neg = self(
             anchor_name, anchor_desc, pos_name, pos_desc, neg_name, neg_desc
@@ -124,16 +127,19 @@ class HarmonizationTriplet(L.LightningModule):
         return loss
 
     def training_step(self, batch, batch_idx):
+        """Logic for training step"""
         loss = self._shared_step(batch)
         self.log('train_loss', loss, prog_bar=True, batch_size=self.batch_size)
         return loss
 
     def validation_step(self, batch, batch_idx):
+        """Logic for validation step"""
         loss = self._shared_step(batch)
         self.log('val_loss', loss, prog_bar=True, batch_size=self.batch_size)
         return loss
 
     def test_step(self, batch, batch_idx):
+        """Logic for testing step"""
         loss = self._shared_step(batch)
         self.log('test_loss', loss, prog_bar=True, batch_size=self.batch_size)
         return loss
@@ -163,9 +169,11 @@ def main():
     test_loader = DataLoader(test_dataset, batch_size=512, shuffle=False)
 
     # define callbacks
+    # stops the model early if validation loss is no longer improving (decreasing)
     early_stop_callback = EarlyStopping(
         monitor="val_loss", min_delta=0.00, patience=5, verbose=False, mode="min"
     )
+    # save the best model during training
     model_checkpoint_callback = ModelCheckpoint(
         save_top_k=1, mode="min", monitor="val_loss", save_last=True
     )
