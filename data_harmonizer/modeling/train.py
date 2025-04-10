@@ -208,7 +208,7 @@ def main():
     trainer.fit(model, train_loader, valid_loader)
 
     # test the model
-    trainer.test(model, dataloaders=test_loader)
+    trainer.test(ckpt_path='best', dataloaders=test_loader)
 
     # once training is done, move the model
     shutil.move(
