@@ -11,7 +11,6 @@ import pandas as pd
 from dotenv import load_dotenv
 from data_harmonizer.data.schema_data import get_schema_features
 
-
 load_dotenv()
 
 TARGET_LINKML_PATH = os.getenv('TARGET_LINKML_PATH')
