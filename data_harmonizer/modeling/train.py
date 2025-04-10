@@ -195,7 +195,7 @@ def main():
         accelerator="cpu",
         logger=CSVLogger(
             save_dir=os.path.abspath(os.path.join(
-                os.path.dirname( __file__ ), '..', '..', 'models', 'logs'
+                os.path.dirname( __file__ ), '..', '..', 'logs', 'modeling'
             )), name='tnn'
         ),
         log_every_n_steps=5
