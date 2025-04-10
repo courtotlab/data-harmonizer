@@ -9,6 +9,11 @@ import os
 import itertools
 import pandas as pd
 from data_harmonizer.data.schema_data import get_schema_features
+from dotenv import load_dotenv
+
+load_dotenv()
+
+TARGET_LINKML_PATH = os.getenv('TARGET_LINKML_PATH')
 
 def create_triplet_template(schema_df: pd.DataFrame) -> pd.DataFrame:
     """Create template that will be used downstream to create a triplet dataset
@@ -144,7 +149,9 @@ def main():
     # create a triplet template that consists of n*2 columns
     # where n representes the number of columns used as features
     # and 2 represents a positive and negative examples
-    schema_df = get_schema_features()
+    schema_df = get_schema_features(os.path.abspath(
+        os.path.join(os.path.dirname( __file__ ), '..', '..', TARGET_LINKML_PATH)
+    ))
     schema_df = schema_df[
         ['field_name', 'field_description']
     ]
