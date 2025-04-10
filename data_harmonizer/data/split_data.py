@@ -8,7 +8,12 @@ set and divides the data into data sets used for training the neural network.
 import os
 import itertools
 import pandas as pd
+from dotenv import load_dotenv
 from data_harmonizer.data.schema_data import get_schema_features
+
+load_dotenv()
+
+TARGET_LINKML_PATH = os.getenv('TARGET_LINKML_PATH')
 
 def create_triplet_template(schema_df: pd.DataFrame) -> pd.DataFrame:
     """Create template that will be used downstream to create a triplet dataset
@@ -126,18 +131,15 @@ def create_triplet_df(
         columns={'reference_field_name': 'pos_field_name'}
     )
 
-    def anc_template_join(
-        anc_df: pd.DataFrame, template_df: pd.DataFrame
-    ) -> pd.DataFrame:
+    def anc_template_join(row: pd.Series) -> pd.DataFrame:
+        anc_df = row.to_frame().T
         result = pd.merge(
-            anc_df, template_df, how='inner', on='pos_field_name'
+            anc_df, triplet_template, how='inner', on='pos_field_name'
         )
         return result
 
     # combine synthetic data with triplet_template
-    triplet_row = synthetic_df.apply(
-        lambda row: anc_template_join(row.to_frame().T, triplet_template), axis=1
-    )
+    triplet_row = synthetic_df.apply(anc_template_join, axis=1)
     triplet_df = pd.concat(list(triplet_row))
 
     return triplet_df
@@ -147,7 +149,9 @@ def main():
     # create a triplet template that consists of n*2 columns
     # where n representes the number of columns used as features
     # and 2 represents a positive and negative examples
-    schema_df = get_schema_features()
+    schema_df = get_schema_features(os.path.abspath(
+        os.path.join(os.path.dirname( __file__ ), '..', '..', TARGET_LINKML_PATH)
+    ))
     schema_df = schema_df[
         ['field_name', 'field_description']
     ]

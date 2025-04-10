@@ -1,19 +1,32 @@
+"""Train a Triplet Neural Network
+
+This module with train a Triplet Neural Network using the previously generated
+synonyms data set. Therefore, the model will be customized to the target
+schema.
+
+"""
+
 import os
+import shutil
 import pandas as pd
 from torch.utils.data import DataLoader, Dataset
 import torch
 import torch.nn as nn
 import lightning as L
+from sentence_transformers import SentenceTransformer
+from lightning.pytorch.loggers import CSVLogger
+from lightning.pytorch.callbacks import EarlyStopping, ModelCheckpoint
 
 
 class HarmonizationDataset(Dataset):
-    def __init__(self, csv_path, dataframe=None):
-        self.dataframe = dataframe or self.load_data(csv_path)
+    """Class to create the data set"""
+    def __init__(self, csv_path):
+        self.dataframe = self.load_data(csv_path)
 
     @staticmethod
     def load_data(csv_path):
+        """Create dataframe for data of interest"""
         df = pd.read_csv(csv_path)
-
         return df
 
     def __len__(self):
@@ -37,11 +50,13 @@ class HarmonizationDataset(Dataset):
         )
 
 class HarmonizationTriplet(L.LightningModule):
+    """Class to load data from a data set"""
     def __init__(self, base_embedding, base_dim):
         super().__init__()
         self.hidden_dim = 32
         self.dropout_rate = 0.2
         self.batch_size = 512
+        # save parameters for review
         self.save_hyperparameters()
 
         self.base_embedding = base_embedding
@@ -83,9 +98,10 @@ class HarmonizationTriplet(L.LightningModule):
         return anchor, pos, neg
 
     def forward_once(self, name, desc):
+        """Create a single vector for each point"""
         # TODO: include enum values
 
-        # using sentence embeddings
+        # using sentence embeddings for description and name
         desc_embedded = torch.from_numpy(
             self.base_embedding.encode(desc)
         )
@@ -103,30 +119,31 @@ class HarmonizationTriplet(L.LightningModule):
 
         return output
 
-    def training_step(self, batch, batch_idx):
+    def _shared_step(self, batch):
+        """Logic shared between all steps"""
         anchor_name, anchor_desc, pos_name, pos_desc, neg_name, neg_desc = batch
         anchor, pos, neg = self(
             anchor_name, anchor_desc, pos_name, pos_desc, neg_name, neg_desc
         )
         loss = self.triplet_loss(anchor, pos, neg)
+
+        return loss
+
+    def training_step(self, batch, batch_idx):
+        """Logic for training step"""
+        loss = self._shared_step(batch)
         self.log('train_loss', loss, prog_bar=True, batch_size=self.batch_size)
         return loss
-    
+
     def validation_step(self, batch, batch_idx):
-        anchor_name, anchor_desc, pos_name, pos_desc, neg_name, neg_desc = batch
-        anchor, pos, neg = self(
-            anchor_name, anchor_desc, pos_name, pos_desc, neg_name, neg_desc
-        )
-        loss = self.triplet_loss(anchor, pos, neg)
+        """Logic for validation step"""
+        loss = self._shared_step(batch)
         self.log('val_loss', loss, prog_bar=True, batch_size=self.batch_size)
         return loss
-    
+
     def test_step(self, batch, batch_idx):
-        anchor_name, anchor_desc, pos_name, pos_desc, neg_name, neg_desc = batch
-        anchor, pos, neg = self(
-            anchor_name, anchor_desc, pos_name, pos_desc, neg_name, neg_desc
-        )
-        loss = self.triplet_loss(anchor, pos, neg)
+        """Logic for testing step"""
+        loss = self._shared_step(batch)
         self.log('test_loss', loss, prog_bar=True, batch_size=self.batch_size)
         return loss
 
@@ -153,6 +170,53 @@ def main():
     train_loader = DataLoader(train_dataset, batch_size=512, shuffle=True)
     valid_loader = DataLoader(valid_dataset, batch_size=512, shuffle=False)
     test_loader = DataLoader(test_dataset, batch_size=512, shuffle=False)
+
+    # define callbacks
+    # stops the model early if validation loss is no longer improving (decreasing)
+    early_stop_callback = EarlyStopping(
+        monitor="val_loss", min_delta=0.00, patience=5, verbose=False, mode="min"
+    )
+    # save the best model during training
+    model_checkpoint_callback = ModelCheckpoint(
+        save_top_k=1, mode="min", monitor="val_loss", save_last=True
+    )
+    callbacks = [
+        early_stop_callback, model_checkpoint_callback
+    ]
+
+    # use sentence transformers for embedding
+    base_embedding = SentenceTransformer("all-MiniLM-L6-v2")
+    base_dim = base_embedding.get_sentence_embedding_dimension()
+
+    # define the model
+    model = HarmonizationTriplet(base_embedding, base_dim)
+
+    # configure trainer
+    trainer = L.Trainer(
+        max_epochs=100,
+        callbacks=callbacks,
+        accelerator="cpu",
+        logger=CSVLogger(
+            save_dir=os.path.abspath(os.path.join(
+                os.path.dirname( __file__ ), '..', '..', 'logs', 'modeling'
+            )), name='tnn'
+        ),
+        log_every_n_steps=5
+    )
+
+    # train using data
+    trainer.fit(model, train_loader, valid_loader)
+
+    # test the model
+    trainer.test(ckpt_path='best', dataloaders=test_loader)
+
+    # once training is done, move the model
+    shutil.move(
+        model_checkpoint_callback.best_model_path,
+        os.path.abspath(os.path.join(
+            os.path.dirname( __file__ ), '..', '..', 'models', 'tnn_final.ckpt'
+        ))
+    )
 
 if __name__ == '__main__':
     main()

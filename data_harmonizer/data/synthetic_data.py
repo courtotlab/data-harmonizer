@@ -20,6 +20,8 @@ CLIENT = OpenAI(
   api_key=os.getenv('OPENAI_API_KEY')
 )
 
+TARGET_LINKML_PATH = os.getenv('TARGET_LINKML_PATH')
+
 def field_name_gen_openai(
     field_name: str, client: OpenAI = CLIENT,
     model_name: str = 'gpt-4o-mini', num_syn: int = 7
@@ -46,10 +48,10 @@ def field_name_gen_openai(
     prompt = f"""
     You are a helpful medical research assistant.
     
-    Create {num_syn} wholly unique field names, formatted in either snake
+    Create {num_syn} wholly unique field names, formatted in snake
     case and camel case, to be used in a clinical data set that are synonymous
-    with the given field name. Return the result as a list of strings without
-    comments. Exclude the given field name in the list.
+    with the given field name. Return the result as a Python list of strings
+    without comments. Exclude the given field name in the list.
 
     <<<
     Field name: {field_name}
@@ -94,8 +96,8 @@ def field_desc_gen_openai(
 
     Create {num_syn} unique field descriptions, of 2-3 sentences each, to be
     used in a clinical data set that are synonymous with the given field
-    description. Return the result as a list of strings without comments.
-    Exclude the given field description in the list.
+    description. Return the result as a Python list of strings without
+    comments. Exclude the given field description in the list.
 
     <<<
     Field description: {field_desc}
@@ -144,7 +146,8 @@ def retry_gen_data(
                 llm_call(attribute, num_syn=num_syn)
             )
 
-            if len(result_list_attempt) == num_syn:
+            if len(result_list_attempt) >= num_syn:
+                result_list_attempt = result_list_attempt[:num_syn]
                 return result_list_attempt
             else:
                 attempt=attempt+1
@@ -210,7 +213,9 @@ def main():
         gen_data_dict[key] = []
 
     # get target schema info which is used to generate synthetic data
-    schema_df = get_schema_features()
+    schema_df = get_schema_features(os.path.abspath(
+        os.path.join(os.path.dirname( __file__ ), '..', '..', TARGET_LINKML_PATH)
+    ))
     for row in schema_df.itertuples(index=False):
         # generate synonyms for a single row in the data frame and
         # store synthetic data inside a dictionary
