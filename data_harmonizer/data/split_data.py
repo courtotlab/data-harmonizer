@@ -8,8 +8,9 @@ set and divides the data into data sets used for training the neural network.
 import os
 import itertools
 import pandas as pd
-from data_harmonizer.data.schema_data import get_schema_features
 from dotenv import load_dotenv
+from data_harmonizer.data.schema_data import get_schema_features
+
 
 load_dotenv()
 
