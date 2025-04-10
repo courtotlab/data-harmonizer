@@ -19,11 +19,13 @@ from lightning.pytorch.callbacks import EarlyStopping, ModelCheckpoint
 
 
 class HarmonizationDataset(Dataset):
+    """Class to create the data set"""
     def __init__(self, csv_path):
         self.dataframe = self.load_data(csv_path)
 
     @staticmethod
     def load_data(csv_path):
+        """Create dataframe for data of interest"""
         df = pd.read_csv(csv_path)
         return df
 
@@ -48,6 +50,7 @@ class HarmonizationDataset(Dataset):
         )
 
 class HarmonizationTriplet(L.LightningModule):
+    """Class to load data from a data set"""
     def __init__(self, base_embedding, base_dim):
         super().__init__()
         self.hidden_dim = 32
