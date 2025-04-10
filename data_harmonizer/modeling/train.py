@@ -76,7 +76,7 @@ class HarmonizationTriplet(L.LightningModule):
         # activation function
         self.relu = nn.ReLU()
 
-        # pairwise distance;
+        # pairwise distance
         self.pdist = nn.PairwiseDistance()
 
         # loss function
@@ -146,6 +146,18 @@ class HarmonizationTriplet(L.LightningModule):
         loss = self._shared_step(batch)
         self.log('test_loss', loss, prog_bar=True, batch_size=self.batch_size)
         return loss
+
+    def predict_step(self, batch, batch_idx):
+
+        # override the forward() method since we don't want to necessitate a negative anchor
+        source_name, source_desc, target_name, target_desc, _, _ = batch
+
+        source = self.forward_once(source_name, source_desc)
+        target = self.forward_once(target_name, target_desc)
+
+        output = self.pdist(source, target)
+
+        return output
 
     def configure_optimizers(self):
         return torch.optim.Adam(self.parameters(), lr=0.01)
