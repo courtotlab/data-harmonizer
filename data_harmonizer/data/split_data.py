@@ -126,18 +126,15 @@ def create_triplet_df(
         columns={'reference_field_name': 'pos_field_name'}
     )
 
-    def anc_template_join(
-        anc_df: pd.DataFrame, template_df: pd.DataFrame
-    ) -> pd.DataFrame:
+    def anc_template_join(row: pd.Series) -> pd.DataFrame:
+        anc_df = row.to_frame().T
         result = pd.merge(
-            anc_df, template_df, how='inner', on='pos_field_name'
+            anc_df, triplet_template, how='inner', on='pos_field_name'
         )
         return result
 
     # combine synthetic data with triplet_template
-    triplet_row = synthetic_df.apply(
-        lambda row: anc_template_join(row.to_frame().T, triplet_template), axis=1
-    )
+    triplet_row = synthetic_df.apply(anc_template_join, axis=1)
     triplet_df = pd.concat(list(triplet_row))
 
     return triplet_df

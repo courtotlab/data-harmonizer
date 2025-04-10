@@ -1,0 +1,33 @@
+name: example
+description: example
+id: https://w3id.org/example
+imports:
+- linkml:types
+prefixes:
+  linkml: https://w3id.org/linkml/
+  example: https://w3id.org/example
+default_prefix: example
+enums:
+slots:
+  slot1:
+    description: slot 1 description
+    examples:
+    - value: '1'
+    identifier: true
+    range: integer
+  slot2:
+    description: slot 2 description
+    examples:
+    - value: '2'
+    range: integer
+  slot3:
+    description: slot 3 description
+    examples:
+    - value: '3.0'
+    range: float
+classes:
+  Observation:
+    slots:
+    - slot1
+    - slot2
+    - slot3
