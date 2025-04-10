@@ -19,8 +19,8 @@ from lightning.pytorch.callbacks import EarlyStopping, ModelCheckpoint
 
 
 class HarmonizationDataset(Dataset):
-    def __init__(self, csv_path, dataframe=None):
-        self.dataframe = dataframe or self.load_data(csv_path)
+    def __init__(self, csv_path):
+        self.dataframe = self.load_data(csv_path)
 
     @staticmethod
     def load_data(csv_path):
