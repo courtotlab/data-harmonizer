@@ -1,5 +1,21 @@
-.venv/*
-.vscode/*
+# Data
+data/1_raw/*
+data/2_interim/*
+data/3_processed/*
 
-*/__pycache__/*
-*/*/__pycache__/*
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# MacOS
+.DS_Store
+
+# Virtual environments
+.venv
+
+#VSCode files
+.vscode

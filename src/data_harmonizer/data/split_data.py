@@ -126,17 +126,16 @@ def create_triplet_df(
         columns={'reference_field_name': 'pos_field_name'}
     )
 
-    def anc_template_join(
-        anc_df: pd.DataFrame, template_df: pd.DataFrame
-    ) -> pd.DataFrame:
+    def anc_template_join(row: pd.Series) -> pd.DataFrame:
+        anc_df = row.to_frame().T
         result = pd.merge(
-            anc_df, template_df, how='inner', on='pos_field_name'
+            anc_df, triplet_template, how='inner', on='pos_field_name'
         )
         return result
 
     # combine synthetic data with triplet_template
     triplet_row = synthetic_df.apply(
-        lambda row: anc_template_join(row.to_frame().T, triplet_template), axis=1
+        anc_template_join, axis=1
     )
     triplet_df = pd.concat(list(triplet_row))
 
@@ -155,7 +154,7 @@ def main():
 
     # split the synthetic data into a training, validation, and test set
     synthetic_path = os.path.abspath(os.path.join(
-        os.path.dirname( __file__ ), '..', '..', 'data', '2_interim', 'synthetic_data.csv'
+        os.path.dirname( __file__ ), '..', '..',  '..', 'data', '2_interim', 'synthetic_data.csv'
     ))
     synthetic_df = pd.read_csv(synthetic_path)
     dataset_dict = split_data(synthetic_df)
@@ -168,7 +167,7 @@ def main():
         triplet_data_type_df = create_triplet_df(data_type_df, triplet_template)
 
         save_path = os.path.abspath(os.path.join(
-            os.path.dirname( __file__ ), '..', '..', 'data', '3_processed',
+            os.path.dirname( __file__ ), '..', '..', '..', 'data', '3_processed',
             'triplet_' + data_type + '.csv'
         ))
         triplet_data_type_df.to_csv(save_path, index=False)
