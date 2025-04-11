@@ -51,7 +51,7 @@ class HarmonizationDataset(Dataset):
 
 class HarmonizationTriplet(L.LightningModule):
     """Class to load data from a data set"""
-    def __init__(self, base_embedding, base_dim):
+    def __init__(self, base_embedding):
         super().__init__()
         self.hidden_dim = 32
         self.dropout_rate = 0.2
@@ -61,7 +61,7 @@ class HarmonizationTriplet(L.LightningModule):
 
         self.base_embedding = base_embedding
         self.base_embedding.requires_grad_(False) # freeze base embedding
-        self.base_dim = base_dim # take base_size
+        self.base_dim = base_embedding.get_sentence_embedding_dimension() # take base_size
 
         # hidden layers
         self.fc1 = nn.Linear(
@@ -187,10 +187,9 @@ def main():
 
     # use sentence transformers for embedding
     base_embedding = SentenceTransformer("all-MiniLM-L6-v2")
-    base_dim = base_embedding.get_sentence_embedding_dimension()
 
     # define the model
-    model = HarmonizationTriplet(base_embedding, base_dim)
+    model = HarmonizationTriplet(base_embedding)
 
     # configure trainer
     trainer = L.Trainer(
