@@ -20,8 +20,13 @@ from lightning.pytorch.callbacks import EarlyStopping, ModelCheckpoint
 
 class HarmonizationDataset(Dataset):
     """Class to create the data set"""
-    def __init__(self, csv_path):
-        self.dataframe = self.load_data(csv_path)
+    def __init__(self, csv_path=None, dataframe=None):
+        if csv_path is not None:
+            self.dataframe = self.load_data(csv_path)
+        elif dataframe is not None:
+            self.dataframe = dataframe
+        else:
+            raise ValueError('Missing CSV path or pandas dataframe')
 
     @staticmethod
     def load_data(csv_path):
@@ -169,13 +174,13 @@ def main():
         os.path.dirname( __file__ ), '..', '..', 'data', '3_processed'
     ))
     train_dataset = HarmonizationDataset(
-        os.path.join(processed_path, 'triplet_train.csv')
+        csv_path=os.path.join(processed_path, 'triplet_train.csv')
     )
     valid_dataset = HarmonizationDataset(
-        os.path.join(processed_path, 'triplet_val.csv')
+        csv_path=os.path.join(processed_path, 'triplet_val.csv')
     )
     test_dataset = HarmonizationDataset(
-        os.path.join(processed_path, 'triplet_test.csv')
+        csv_path=os.path.join(processed_path, 'triplet_test.csv')
     )
 
     # create data loaders from data sets
