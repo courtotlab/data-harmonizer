@@ -76,7 +76,8 @@ class HarmonizationTriplet(L.LightningModule):
         # activation function
         self.relu = nn.ReLU()
 
-        # pairwise distance;
+        # pairwise distance
+        # default p is 2 which equates to Euclidean distance (L2 norm)
         self.pdist = nn.PairwiseDistance()
 
         # loss function
