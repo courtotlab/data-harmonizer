@@ -1,6 +1,8 @@
 import os
 from dotenv import load_dotenv
 import pandas as pd
+from torch.utils.data import DataLoader
+from data_harmonizer.modeling.train import HarmonizationDataset
 from data_harmonizer.data.schema_data import get_schema_features
 
 load_dotenv()
@@ -48,5 +50,8 @@ def main():
     predict_df[4] = ''
     predict_df[5] = ''
 
+    predict_dataset = HarmonizationDataset(dataframe=predict_df)
+    predict_dataloader = DataLoader(predict_dataset, batch_size=512, shuffle=False)
+    
 if __name__ == '__main__':
     main()
