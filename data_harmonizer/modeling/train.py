@@ -32,18 +32,24 @@ class HarmonizationDataset(Dataset):
     def load_data(csv_path):
         """Create dataframe for data of interest"""
         df = pd.read_csv(csv_path)
+
+        df = df.reindex(columns=[
+            'field_name', 'field_description',
+            'pos_field_name', 'pos_field_description',
+            'neg_field_name', 'neg_field_description'
+        ])
         return df
 
     def __len__(self):
         return len(self.dataframe)
 
     def __getitem__(self, idx):
-        field_name = self.dataframe.iloc[idx]['field_name']
-        field_desc = self.dataframe.iloc[idx]['field_description']
-        pos_field_name = self.dataframe.iloc[idx]['pos_field_name']
-        pos_field_desc = self.dataframe.iloc[idx]['pos_field_description']
-        neg_field_name = self.dataframe.iloc[idx]['neg_field_name']
-        neg_field_desc = self.dataframe.iloc[idx]['neg_field_description']
+        field_name = self.dataframe.iloc[idx, 0]
+        field_desc = self.dataframe.iloc[idx, 1]
+        pos_field_name = self.dataframe.iloc[idx, 2]
+        pos_field_desc = self.dataframe.iloc[idx, 3]
+        neg_field_name = self.dataframe.iloc[idx, 4]
+        neg_field_desc = self.dataframe.iloc[idx, 5]
 
         return (
             field_name,
