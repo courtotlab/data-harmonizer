@@ -68,7 +68,7 @@ class HarmonizationTriplet(L.LightningModule):
             2 * self.base_dim, # multiply by 2 since we use it twice (name, description)
             self.hidden_dim
         )
-        self.fc2 = nn.Linear(self.hidden_dim, 1)
+        self.fc2 = nn.Linear(self.hidden_dim, 16)
 
         # dropout layer
         self.dropout = nn.Dropout(p=self.dropout_rate)
