@@ -80,7 +80,17 @@ class HarmonizationTriplet(L.LightningModule):
         # default p is 2 which equates to Euclidean distance (L2 norm)
         self.pdist = nn.PairwiseDistance()
 
-        # loss function
+        # Triplet loss function:
+        # compares an anchor point with a positive point (same class)
+        # and a negative point (different class) using Euclidean distance
+        # the loss function will attempt to minimize the distance between
+        # anchor point and positive point while maximizing the distance between 
+        # the anchor and negative samples by a certain margin (default: 1)
+        # explicity, the function is as follows:
+        # L = max (d(a, p) - d(a, n) + m, 0)
+        # where d is the Euclidean distance function, a is the positional vector 
+        # of the anchor, p in the positional vector of the positive sample, n is 
+        # the positional vector of the negative sample and m is the margin
         self.triplet_loss = nn.TripletMarginWithDistanceLoss(
             distance_function=self.pdist
         )
