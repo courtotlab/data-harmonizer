@@ -56,7 +56,7 @@ class HarmonizationDataset(Dataset):
 
 class HarmonizationTriplet(L.LightningModule):
     """Class to load data from a data set"""
-    def __init__(self, base_embedding, base_dim):
+    def __init__(self, base_embedding):
         super().__init__()
         self.hidden_dim = 32
         self.dropout_rate = 0.2
@@ -66,14 +66,14 @@ class HarmonizationTriplet(L.LightningModule):
 
         self.base_embedding = base_embedding
         self.base_embedding.requires_grad_(False) # freeze base embedding
-        self.base_dim = base_dim # take base_size
+        self.base_dim = base_embedding.get_sentence_embedding_dimension() # take base_size
 
         # hidden layers
         self.fc1 = nn.Linear(
             2 * self.base_dim, # multiply by 2 since we use it twice (name, description)
             self.hidden_dim
         )
-        self.fc2 = nn.Linear(self.hidden_dim, 1)
+        self.fc2 = nn.Linear(self.hidden_dim, 16)
 
         # dropout layer
         self.dropout = nn.Dropout(p=self.dropout_rate)
@@ -82,9 +82,20 @@ class HarmonizationTriplet(L.LightningModule):
         self.relu = nn.ReLU()
 
         # pairwise distance
+        # default p is 2 which equates to Euclidean distance (L2 norm)
         self.pdist = nn.PairwiseDistance()
 
-        # loss function
+        # Triplet loss function:
+        # compares an anchor point with a positive point (same class)
+        # and a negative point (different class) using Euclidean distance
+        # the loss function will attempt to minimize the distance between
+        # anchor point and positive point while maximizing the distance between 
+        # the anchor and negative samples by a certain margin (default: 1)
+        # explicity, the function is as follows:
+        # L = max (d(a, p) - d(a, n) + m, 0)
+        # where d is the Euclidean distance function, a is the positional vector 
+        # of the anchor, p in the positional vector of the positive sample, n is 
+        # the positional vector of the negative sample and m is the margin
         self.triplet_loss = nn.TripletMarginWithDistanceLoss(
             distance_function=self.pdist
         )
@@ -203,10 +214,9 @@ def main():
 
     # use sentence transformers for embedding
     base_embedding = SentenceTransformer("all-MiniLM-L6-v2")
-    base_dim = base_embedding.get_sentence_embedding_dimension()
 
     # define the model
-    model = HarmonizationTriplet(base_embedding, base_dim)
+    model = HarmonizationTriplet(base_embedding)
 
     # configure trainer
     trainer = L.Trainer(
