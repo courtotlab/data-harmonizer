@@ -2,6 +2,7 @@ import os
 from dotenv import load_dotenv
 import pandas as pd
 import numpy as np
+from scipy.optimize import linear_sum_assignment
 from torch.utils.data import DataLoader
 import torch
 import lightning as L
@@ -55,7 +56,7 @@ def main():
 
     predict_dataset = HarmonizationDataset(dataframe=predict_df)
     predict_dataloader = DataLoader(predict_dataset, batch_size=512, shuffle=False)
-    
+
     # load the previously trained model
     model = HarmonizationTriplet.load_from_checkpoint(
         os.path.abspath(os.path.join(
@@ -72,6 +73,21 @@ def main():
             torch.Tensor.numpy(predict_batch)
         )
     predictions_numpy = np.asarray(predictions_list)
+
+    # each internal list (i.e row) represents single target
+    # each value in the list (i.e column) represents all source
+    cost_matrix = predictions_numpy.reshape(
+        target.shape[0], source.shape[0]
+    )
+
+    # problem reduces to bipartite matching problem
+    # scipy's linear_sum_assignment uses a modified Jonker-Volgenant algorithm
+    # (which itself is a variant of the Hungarian method/Kuhn-Munkres algorithm)
+
+    # based on the way the cost matrix was set up, target corresponds to row index
+    # and source corresponds to column index of cost matrix
+
+    target_ind, source_ind = linear_sum_assignment(cost_matrix)
 
 if __name__ == '__main__':
     main()
