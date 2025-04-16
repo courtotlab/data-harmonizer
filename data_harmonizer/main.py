@@ -1,7 +1,9 @@
 import os
 from dotenv import load_dotenv
 import pandas as pd
+import numpy as np
 from torch.utils.data import DataLoader
+import torch
 import lightning as L
 from data_harmonizer.modeling.train import HarmonizationTriplet, HarmonizationDataset
 from data_harmonizer.data.schema_data import get_schema_features
@@ -62,6 +64,14 @@ def main():
     )
     trainer = L.Trainer(accelerator='cpu')
     predictions = trainer.predict(model, predict_dataloader)
+
+    # create a single numpy array from the batched data
+    predictions_list = []
+    for predict_batch in predictions:
+        predictions_list.extend(
+            torch.Tensor.numpy(predict_batch)
+        )
+    predictions_numpy = np.asarray(predictions_list)
 
 if __name__ == '__main__':
     main()
