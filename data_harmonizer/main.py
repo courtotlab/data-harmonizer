@@ -89,5 +89,24 @@ def main():
 
     target_ind, source_ind = linear_sum_assignment(cost_matrix)
 
+    # will hold all predicted assignments
+    assignment_list = []
+    for i in range(len(target_ind)):
+        target_value = target.iloc[target_ind[i], 0]
+        source_value = source.iloc[source_ind[i], 0]
+        associated_cost = cost_matrix[target_ind[i], source_ind[i]]
+        assignment_list.append(
+            {
+                'Predicted target field': target_value,
+                'Predicted source field': source_value,
+                'Associated cost': associated_cost
+            }
+        )
+
+    # convert to dataframe
+    assignment_df = pd.DataFrame(assignment_list)
+    assignment_df = assignment_df.sort_values(by=['Associated cost'])
+    print(assignment_df)
+
 if __name__ == '__main__':
     main()
