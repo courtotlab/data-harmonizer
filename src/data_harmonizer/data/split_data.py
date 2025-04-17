@@ -159,7 +159,7 @@ def main():
 
     # split the synthetic data into a training, validation, and test set
     synthetic_path = os.path.abspath(os.path.join(
-        os.path.dirname( __file__ ), '..', '..', 'data', '2_interim', 'synthetic_data.csv'
+        os.path.dirname( __file__ ), '..', '..',  '..', 'data', '2_interim', 'synthetic_data.csv'
     ))
     synthetic_df = pd.read_csv(synthetic_path)
     dataset_dict = split_data(synthetic_df)
@@ -172,7 +172,7 @@ def main():
         triplet_data_type_df = create_triplet_df(data_type_df, triplet_template)
 
         save_path = os.path.abspath(os.path.join(
-            os.path.dirname( __file__ ), '..', '..', 'data', '3_processed',
+            os.path.dirname( __file__ ), '..', '..', '..', 'data', '3_processed',
             'triplet_' + data_type + '.csv'
         ))
         triplet_data_type_df.to_csv(save_path, index=False)
