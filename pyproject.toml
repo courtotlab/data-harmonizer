@@ -1,0 +1,23 @@
+[project]
+name = "data-harmonizer"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "dotenv==0.9.9",
+    "lightning==2.5.1",
+    "openai==1.72.0",
+    "pandas==2.2.3",
+    "PyYAML==6.0.2",
+    "sentence-transformers==4.0.2",
+    "torch==2.6.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.5",
+]
+
+[tool.uv]
+package = true

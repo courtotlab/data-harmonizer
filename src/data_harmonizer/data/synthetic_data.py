@@ -138,8 +138,10 @@ def retry_gen_data(
         cannot create a list of strings with num_syn strings within 
         num_retries, None is returned.
     """
+    print(f"Generating {attribute}")
     attempt=1
     while attempt<=num_retries:
+        print(f" - attempt {attempt}")
         try:
             # attempt to turn the string of a list into a literal list
             result_list_attempt = ast.literal_eval(
@@ -180,7 +182,6 @@ def get_gen_row_data_dict(
     --------
     retry_gen_data
     """
-
     gen_row_data_dict = {}
     for field_feature in list(gen_func.keys()):
         # represents the value we want to get synonyms for
@@ -241,7 +242,7 @@ def main():
 
     synthetic = pd.DataFrame.from_dict(gen_data_dict)
     save_path = os.path.abspath(os.path.join(
-        os.path.dirname( __file__ ), '..', '..', 'data', '2_interim', 'synthetic_data.csv'
+        os.path.dirname( __file__ ), '..', '..', '..', 'data', '2_interim', 'synthetic_data.csv'
     ))
     synthetic.to_csv(save_path, index=False)
 
