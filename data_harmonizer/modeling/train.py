@@ -56,6 +56,7 @@ class HarmonizationDataset(Dataset):
         )
     
 class HarmonizationInferenceDataset(HarmonizationDataset):
+    """Class to create the inference data set"""
     def __getitem__(self, idx):
         source_field_name = self.dataframe.iloc[idx]['source_field_name']
         source_field_desc = self.dataframe.iloc[idx]['source_field_description']
