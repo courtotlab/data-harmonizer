@@ -20,13 +20,19 @@ from lightning.pytorch.callbacks import EarlyStopping, ModelCheckpoint
 
 class HarmonizationDataset(Dataset):
     """Class to create the data set"""
-    def __init__(self, csv_path):
-        self.dataframe = self.load_data(csv_path)
+    def __init__(self, csv_path=None, dataframe=None):
+        if csv_path is not None:
+            self.dataframe = self.load_data(csv_path)
+        elif dataframe is not None:
+            self.dataframe = dataframe
+        else:
+            raise ValueError('Missing CSV path or pandas dataframe')
 
     @staticmethod
     def load_data(csv_path):
         """Create dataframe for data of interest"""
         df = pd.read_csv(csv_path)
+
         return df
 
     def __len__(self):
@@ -48,6 +54,21 @@ class HarmonizationDataset(Dataset):
             neg_field_name,
             neg_field_desc
         )
+    
+class HarmonizationInferenceDataset(HarmonizationDataset):
+    """Class to create the inference data set"""
+    def __getitem__(self, idx):
+        source_field_name = self.dataframe.iloc[idx]['source_field_name']
+        source_field_desc = self.dataframe.iloc[idx]['source_field_description']
+        target_field_name = self.dataframe.iloc[idx]['target_field_name']
+        target_field_desc = self.dataframe.iloc[idx]['target_field_description']
+
+        return (
+            source_field_name,
+            source_field_desc,
+            target_field_name,
+            target_field_desc,
+        )
 
 class HarmonizationTriplet(L.LightningModule):
     """Class to load data from a data set"""
@@ -57,7 +78,7 @@ class HarmonizationTriplet(L.LightningModule):
         self.dropout_rate = 0.2
         self.batch_size = 512
         # save parameters for review
-        self.save_hyperparameters()
+        self.save_hyperparameters(ignore=['base_embedding'])
 
         self.base_embedding = base_embedding
         self.base_embedding.requires_grad_(False) # freeze base embedding
@@ -158,6 +179,18 @@ class HarmonizationTriplet(L.LightningModule):
         self.log('test_loss', loss, prog_bar=True, batch_size=self.batch_size)
         return loss
 
+    def predict_step(self, batch, batch_idx):
+
+        # override the forward() method since we don't want to necessitate a negative anchor
+        source_name, source_desc, target_name, target_desc = batch
+
+        source = self.forward_once(source_name, source_desc)
+        target = self.forward_once(target_name, target_desc)
+
+        output = self.pdist(source, target)
+
+        return output
+
     def configure_optimizers(self):
         return torch.optim.Adam(self.parameters(), lr=0.01)
 
@@ -168,13 +201,13 @@ def main():
         os.path.dirname( __file__ ), '..', '..', 'data', '3_processed'
     ))
     train_dataset = HarmonizationDataset(
-        os.path.join(processed_path, 'triplet_train.csv')
+        csv_path=os.path.join(processed_path, 'triplet_train.csv')
     )
     valid_dataset = HarmonizationDataset(
-        os.path.join(processed_path, 'triplet_val.csv')
+        csv_path=os.path.join(processed_path, 'triplet_val.csv')
     )
     test_dataset = HarmonizationDataset(
-        os.path.join(processed_path, 'triplet_test.csv')
+        csv_path=os.path.join(processed_path, 'triplet_test.csv')
     )
 
     # create data loaders from data sets

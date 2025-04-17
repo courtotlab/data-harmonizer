@@ -33,4 +33,6 @@ def get_schema_features(linkml_path: str) -> pd.DataFrame:
         'description': 'field_description'
     })
 
+    schema_df = schema_df.reset_index(drop=True)
+
     return schema_df
