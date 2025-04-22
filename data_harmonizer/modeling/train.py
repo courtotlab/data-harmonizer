@@ -54,7 +54,7 @@ class HarmonizationDataset(Dataset):
             neg_field_name,
             neg_field_desc
         )
-    
+
 class HarmonizationInferenceDataset(HarmonizationDataset):
     """Class to create the inference data set"""
     def __getitem__(self, idx):
@@ -111,12 +111,12 @@ class HarmonizationTriplet(L.LightningModule):
         # compares an anchor point with a positive point (same class)
         # and a negative point (different class) using Euclidean distance
         # the loss function will attempt to minimize the distance between
-        # anchor point and positive point while maximizing the distance between 
+        # anchor point and positive point while maximizing the distance between
         # the anchor and negative samples by a certain margin (default: 1)
         # explicity, the function is as follows:
         # L = max (d(a, p) - d(a, n) + m, 0)
-        # where d is the Euclidean distance function, a is the positional vector 
-        # of the anchor, p in the positional vector of the positive sample, n is 
+        # where d is the Euclidean distance function, a is the positional vector
+        # of the anchor, p in the positional vector of the positive sample, n is
         # the positional vector of the negative sample and m is the margin
         self.triplet_loss = nn.TripletMarginWithDistanceLoss(
             distance_function=self.pdist
@@ -253,9 +253,9 @@ def main():
         for hidden_dim in hidden_dims
         for output_dim in output_dims
     ]
-    
+
     for search_param in search_params:
-    
+
         # use sentence transformers for embedding;
         # could theoretically test different sentence transformers
         # as part of hyperparameter tuning
