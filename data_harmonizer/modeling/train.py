@@ -234,30 +234,59 @@ def main():
         early_stop_callback, model_checkpoint_callback
     ]
 
-    # use sentence transformers for embedding
-    base_embedding = SentenceTransformer("all-MiniLM-L6-v2")
+    # define all possible values for hyperparameters;
+    # rough rule of thumb is that the embedding size should be the
+    # fourth root of the number of categories
+    # https://developers.googleblog.com/en/introducing-tensorflow-feature-columns/
+    dropout_rates = [0.1, 0.2, 0.3]
+    hidden_dims = [4, 8, 16, 32]
+    output_dims = [4, 8, 16, 32]
 
-    # define the model
-    model = HarmonizationTriplet(base_embedding)
+    # a grid search combines all params
+    search_params = [
+        {
+            'dropout_rate': dropout_rate, 
+            'hidden_dim': hidden_dim,
+            'output_dim': output_dim,
+        }
+        for dropout_rate in dropout_rates
+        for hidden_dim in hidden_dims
+        for output_dim in output_dims
+    ]
+    
+    for search_param in search_params:
+    
+        # use sentence transformers for embedding;
+        # could theoretically test different sentence transformers
+        # as part of hyperparameter tuning
+        base_embedding = SentenceTransformer("all-MiniLM-L6-v2")
 
-    # configure trainer
-    trainer = L.Trainer(
-        max_epochs=100,
-        callbacks=callbacks,
-        accelerator="cpu",
-        logger=CSVLogger(
-            save_dir=os.path.abspath(os.path.join(
-                os.path.dirname( __file__ ), '..', '..', 'logs', 'modeling'
-            )), name='tnn'
-        ),
-        log_every_n_steps=5
-    )
+        # define the model
+        model = HarmonizationTriplet(
+            base_embedding,
+            hidden_dim = search_param['hidden_dim'],
+            dropout_rate = search_param['dropout_rate'],
+            output_dim = search_param['output_dim']
+        )
 
-    # train using data
-    trainer.fit(model, train_loader, valid_loader)
+        # configure trainer
+        trainer = L.Trainer(
+            max_epochs=100,
+            callbacks=callbacks,
+            accelerator="cpu",
+            logger=CSVLogger(
+                save_dir=os.path.abspath(os.path.join(
+                    os.path.dirname( __file__ ), '..', '..', 'logs', 'modeling'
+                )), name='tnn'
+            ),
+            log_every_n_steps=5
+        )
 
-    # test the model
-    trainer.test(ckpt_path='best', dataloaders=test_loader)
+        # train using data
+        trainer.fit(model, train_loader, valid_loader)
+
+        # test the model
+        trainer.test(ckpt_path='best', dataloaders=test_loader)
 
     # once training is done, move the model
     shutil.move(
