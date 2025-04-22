@@ -72,11 +72,17 @@ class HarmonizationInferenceDataset(HarmonizationDataset):
 
 class HarmonizationTriplet(L.LightningModule):
     """Class to load data from a data set"""
-    def __init__(self, base_embedding):
+    def __init__(
+            self,
+            base_embedding, hidden_dim = 32,
+            dropout_rate = 0.2, batch_size = 512,
+            output_dim = 16
+    ):
         super().__init__()
-        self.hidden_dim = 32
-        self.dropout_rate = 0.2
-        self.batch_size = 512
+        self.hidden_dim = hidden_dim
+        self.dropout_rate = dropout_rate
+        self.batch_size = batch_size
+        self.output_dim = output_dim
         # save parameters for review
         self.save_hyperparameters(ignore=['base_embedding'])
 
@@ -89,7 +95,7 @@ class HarmonizationTriplet(L.LightningModule):
             2 * self.base_dim, # multiply by 2 since we use it twice (name, description)
             self.hidden_dim
         )
-        self.fc2 = nn.Linear(self.hidden_dim, 16)
+        self.fc2 = nn.Linear(self.hidden_dim, self.output_dim)
 
         # dropout layer
         self.dropout = nn.Dropout(p=self.dropout_rate)
