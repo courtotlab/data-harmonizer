@@ -8,7 +8,7 @@ from scipy.optimize import linear_sum_assignment
 from torch.utils.data import DataLoader
 import torch
 import lightning as L
-from data_harmonizer.modeling.train import HarmonizationTriplet, HarmonizationDataset
+from data_harmonizer.modeling.train import HarmonizationTriplet, HarmonizationInferenceDataset
 from data_harmonizer.data.schema_data import get_schema_features
 
 load_dotenv()
@@ -22,10 +22,12 @@ def main():
     target = get_schema_features(os.path.abspath(
         os.path.join(os.path.dirname( __file__ ), '..', TARGET_LINKML_PATH)
     ))
+    target = target.set_axis(['target_field_name', 'target_field_description'], axis=1)
 
     source = get_schema_features(os.path.abspath(
         os.path.join(os.path.dirname( __file__ ), '..', SOURCE_LINKML_PATH)
     ))
+    source = source.set_axis(['source_field_name', 'source_field_description'], axis=1)
 
     # for source, repeat on a per dataframe basis
     mod_source = pd.concat(
@@ -50,13 +52,7 @@ def main():
         axis=1, ignore_index=False
     )
 
-    # training data uses negative points but inference doesn't
-    # add empty columns to batch correctly
-    # 2 columns represent 2 features
-    predict_df[4] = ''
-    predict_df[5] = ''
-
-    predict_dataset = HarmonizationDataset(dataframe=predict_df)
+    predict_dataset = HarmonizationInferenceDataset(dataframe=predict_df)
     predict_dataloader = DataLoader(predict_dataset, batch_size=512, shuffle=False)
 
     # load the previously trained model
