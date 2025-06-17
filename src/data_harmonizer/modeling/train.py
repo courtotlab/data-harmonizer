@@ -78,7 +78,7 @@ class HarmonizationTriplet(L.LightningModule):
         self.dropout_rate = 0.2
         self.batch_size = 512
         # save parameters for review
-        self.save_hyperparameters(ignore=['base_embedding'])
+        self.save_hyperparameters()
 
         self.base_embedding = base_embedding
         self.base_embedding.requires_grad_(False) # freeze base embedding
@@ -198,7 +198,7 @@ def main():
 
     # get datasets
     processed_path = os.path.abspath(os.path.join(
-        os.path.dirname( __file__ ), '..', '..', 'data', '3_processed'
+        os.path.dirname( __file__ ),  '..', '..', '..', 'data', '3_processed'
     ))
     train_dataset = HarmonizationDataset(
         csv_path=os.path.join(processed_path, 'triplet_train.csv')
@@ -241,7 +241,7 @@ def main():
         accelerator="cpu",
         logger=CSVLogger(
             save_dir=os.path.abspath(os.path.join(
-                os.path.dirname( __file__ ), '..', '..', 'logs', 'modeling'
+                os.path.dirname( __file__ ), '..',  '..', '..', 'logs', 'modeling'
             )), name='tnn'
         ),
         log_every_n_steps=5
@@ -257,7 +257,7 @@ def main():
     shutil.move(
         model_checkpoint_callback.best_model_path,
         os.path.abspath(os.path.join(
-            os.path.dirname( __file__ ), '..', '..', 'models', 'tnn_final.ckpt'
+            os.path.dirname( __file__ ),  '..', '..', '..', 'models', 'tnn_final.ckpt'
         ))
     )
 

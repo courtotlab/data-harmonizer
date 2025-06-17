@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 import pandas as pd
 import numpy as np
 from scipy.optimize import linear_sum_assignment
+# from sentence_transformers import SentenceTransformer
 from torch.utils.data import DataLoader
 import torch
 import lightning as L
@@ -55,11 +56,14 @@ def main():
     predict_dataset = HarmonizationInferenceDataset(dataframe=predict_df)
     predict_dataloader = DataLoader(predict_dataset, batch_size=512, shuffle=False)
 
+    # use sentence transformers for embedding
+    # base_embedding = SentenceTransformer("all-MiniLM-L6-v2")
     # load the previously trained model
     model = HarmonizationTriplet.load_from_checkpoint(
         os.path.abspath(os.path.join(
-            os.path.dirname( __file__ ), '..', 'models', 'tnn_final.ckpt'
-        ))
+            os.path.dirname( __file__ ), '..', '..', 'models', 'tnn_final.ckpt'
+        ))#,
+        # base_embedding=base_embedding
     )
     trainer = L.Trainer(accelerator='cpu')
     predictions = trainer.predict(model, predict_dataloader)
