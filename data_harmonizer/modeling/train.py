@@ -54,7 +54,7 @@ class HarmonizationDataset(Dataset):
             neg_field_name,
             neg_field_desc
         )
-    
+
 class HarmonizationInferenceDataset(HarmonizationDataset):
     """Class to create the inference data set"""
     def __getitem__(self, idx):
@@ -72,11 +72,17 @@ class HarmonizationInferenceDataset(HarmonizationDataset):
 
 class HarmonizationTriplet(L.LightningModule):
     """Class to load data from a data set"""
-    def __init__(self, base_embedding):
+    def __init__(
+            self,
+            base_embedding, hidden_dim = 32,
+            dropout_rate = 0.2, batch_size = 512,
+            output_dim = 16
+    ):
         super().__init__()
-        self.hidden_dim = 32
-        self.dropout_rate = 0.2
-        self.batch_size = 512
+        self.hidden_dim = hidden_dim
+        self.dropout_rate = dropout_rate
+        self.batch_size = batch_size
+        self.output_dim = output_dim
         # save parameters for review
         self.save_hyperparameters()
 
@@ -89,7 +95,7 @@ class HarmonizationTriplet(L.LightningModule):
             2 * self.base_dim, # multiply by 2 since we use it twice (name, description)
             self.hidden_dim
         )
-        self.fc2 = nn.Linear(self.hidden_dim, 16)
+        self.fc2 = nn.Linear(self.hidden_dim, self.output_dim)
 
         # dropout layer
         self.dropout = nn.Dropout(p=self.dropout_rate)
@@ -105,12 +111,12 @@ class HarmonizationTriplet(L.LightningModule):
         # compares an anchor point with a positive point (same class)
         # and a negative point (different class) using Euclidean distance
         # the loss function will attempt to minimize the distance between
-        # anchor point and positive point while maximizing the distance between 
+        # anchor point and positive point while maximizing the distance between
         # the anchor and negative samples by a certain margin (default: 1)
         # explicity, the function is as follows:
         # L = max (d(a, p) - d(a, n) + m, 0)
-        # where d is the Euclidean distance function, a is the positional vector 
-        # of the anchor, p in the positional vector of the positive sample, n is 
+        # where d is the Euclidean distance function, a is the positional vector
+        # of the anchor, p in the positional vector of the positive sample, n is
         # the positional vector of the negative sample and m is the margin
         self.triplet_loss = nn.TripletMarginWithDistanceLoss(
             distance_function=self.pdist
@@ -228,30 +234,59 @@ def main():
         early_stop_callback, model_checkpoint_callback
     ]
 
-    # use sentence transformers for embedding
-    base_embedding = SentenceTransformer("all-MiniLM-L6-v2")
+    # define all possible values for hyperparameters;
+    # rough rule of thumb is that the embedding size should be the
+    # fourth root of the number of categories
+    # https://developers.googleblog.com/en/introducing-tensorflow-feature-columns/
+    dropout_rates = [0.1, 0.2, 0.3]
+    hidden_dims = [4, 8, 16, 32]
+    output_dims = [4, 8, 16, 32]
 
-    # define the model
-    model = HarmonizationTriplet(base_embedding)
+    # a grid search combines all params
+    search_params = [
+        {
+            'dropout_rate': dropout_rate, 
+            'hidden_dim': hidden_dim,
+            'output_dim': output_dim,
+        }
+        for dropout_rate in dropout_rates
+        for hidden_dim in hidden_dims
+        for output_dim in output_dims
+    ]
 
-    # configure trainer
-    trainer = L.Trainer(
-        max_epochs=100,
-        callbacks=callbacks,
-        accelerator="cpu",
-        logger=CSVLogger(
-            save_dir=os.path.abspath(os.path.join(
-                os.path.dirname( __file__ ), '..', '..', 'logs', 'modeling'
-            )), name='tnn'
-        ),
-        log_every_n_steps=5
-    )
+    for search_param in search_params:
 
-    # train using data
-    trainer.fit(model, train_loader, valid_loader)
+        # use sentence transformers for embedding;
+        # could theoretically test different sentence transformers
+        # as part of hyperparameter tuning
+        base_embedding = SentenceTransformer("all-MiniLM-L6-v2")
 
-    # test the model
-    trainer.test(ckpt_path='best', dataloaders=test_loader)
+        # define the model
+        model = HarmonizationTriplet(
+            base_embedding,
+            hidden_dim = search_param['hidden_dim'],
+            dropout_rate = search_param['dropout_rate'],
+            output_dim = search_param['output_dim']
+        )
+
+        # configure trainer
+        trainer = L.Trainer(
+            max_epochs=100,
+            callbacks=callbacks,
+            accelerator="cpu",
+            logger=CSVLogger(
+                save_dir=os.path.abspath(os.path.join(
+                    os.path.dirname( __file__ ), '..', '..', 'logs', 'modeling'
+                )), name='tnn'
+            ),
+            log_every_n_steps=5
+        )
+
+        # train using data
+        trainer.fit(model, train_loader, valid_loader)
+
+        # test the model
+        trainer.test(ckpt_path='best', dataloaders=test_loader)
 
     # once training is done, move the model
     shutil.move(
