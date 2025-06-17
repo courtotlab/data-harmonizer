@@ -2,6 +2,9 @@
 data/1_raw/*
 data/2_interim/*
 data/3_processed/*
+lightning_logs
+logs/modeling
+models/tnn*
 
 # Python-generated files
 __pycache__/
