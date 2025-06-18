@@ -5,6 +5,7 @@ data/3_processed/*
 lightning_logs
 logs/modeling
 models/tnn*
+cli_test
 
 # Python-generated files
 __pycache__/

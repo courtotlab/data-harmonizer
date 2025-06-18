@@ -3,6 +3,10 @@ name = "data-harmonizer"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
+authors = [
+    { name = "Ryan Seeto", email = "ryan.seeto@alumni.utoronto.ca" },
+    { name = "Jochen Weile", email = "jweile@oicr.on.ca" }
+]
 requires-python = ">=3.13"
 dependencies = [
     "dotenv==0.9.9",
@@ -14,7 +18,11 @@ dependencies = [
     "scipy>=1.15.2",
     "sentence-transformers==4.0.2",
     "torch==2.6.0",
+    "typer>=0.16.0",
 ]
+
+[project.scripts]
+data-harmonizer = "data_harmonizer.cli.cli:app"
 
 [dependency-groups]
 dev = [
@@ -23,3 +31,10 @@ dev = [
 
 [tool.uv]
 package = true
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.ruff]
+indent-width = 4
