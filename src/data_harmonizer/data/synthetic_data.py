@@ -16,15 +16,16 @@ from data_harmonizer.data.schema_data import get_schema_features
 
 load_dotenv()
 
-CLIENT = OpenAI(
-  api_key=os.getenv('OPENAI_API_KEY')
-)
+CLIENT = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-TARGET_LINKML_PATH = os.getenv('TARGET_LINKML_PATH')
+TARGET_LINKML_PATH = os.getenv("TARGET_LINKML_PATH")
+
 
 def field_name_gen_openai(
-    field_name: str, client: OpenAI = CLIENT,
-    model_name: str = 'gpt-4o-mini', num_syn: int = 7
+    field_name: str,
+    client: OpenAI = CLIENT,
+    model_name: str = "gpt-4o-mini",
+    num_syn: int = 7,
 ) -> str | None:
     """Generates a list of synonyms from a given field name using OpenAI
 
@@ -59,18 +60,17 @@ def field_name_gen_openai(
     """
 
     completion = client.chat.completions.create(
-        model=model_name,
-        store=False,
-        messages=[
-            {'role': 'user', 'content': prompt}
-        ]
+        model=model_name, store=False, messages=[{"role": "user", "content": prompt}]
     )
 
     return completion.choices[0].message.content
 
+
 def field_desc_gen_openai(
-    field_desc: str, client: OpenAI = CLIENT,
-    model_name: str = 'gpt-4o-mini', num_syn: int = 7
+    field_desc: str,
+    client: OpenAI = CLIENT,
+    model_name: str = "gpt-4o-mini",
+    num_syn: int = 7,
 ) -> str | None:
     """Generates a list of synonyms from a given field descriptions using OpenAI
 
@@ -105,18 +105,17 @@ def field_desc_gen_openai(
     """
 
     completion = client.chat.completions.create(
-        model=model_name,
-        store=False,
-        messages=[
-            {'role': 'user', 'content': prompt}
-        ]
+        model=model_name, store=False, messages=[{"role": "user", "content": prompt}]
     )
 
     return completion.choices[0].message.content
 
+
 def retry_gen_data(
     llm_call: Callable[[str, OpenAI, str, int], list[str] | None],
-    attribute: str, num_syn: int = 7, num_retries: int = 5
+    attribute: str,
+    num_syn: int = 7,
+    num_retries: int = 5,
 ) -> list[str] | None:
     """Retry to generate synthetic data
 
@@ -134,30 +133,29 @@ def retry_gen_data(
     Returns
     -------
     list[str] | None
-        Returns a list of strings with a length of num_syn. If the function 
-        cannot create a list of strings with num_syn strings within 
+        Returns a list of strings with a length of num_syn. If the function
+        cannot create a list of strings with num_syn strings within
         num_retries, None is returned.
     """
     print(f"Generating {attribute}")
-    attempt=1
-    while attempt<=num_retries:
+    attempt = 1
+    while attempt <= num_retries:
         print(f" - attempt {attempt}")
         try:
             # attempt to turn the string of a list into a literal list
-            result_list_attempt = ast.literal_eval(
-                llm_call(attribute, num_syn=num_syn)
-            )
+            result_list_attempt = ast.literal_eval(llm_call(attribute, num_syn=num_syn))
 
             if len(result_list_attempt) >= num_syn:
                 result_list_attempt = result_list_attempt[:num_syn]
                 return result_list_attempt
             else:
-                attempt=attempt+1
+                attempt = attempt + 1
 
-        except:
-            attempt=attempt+1
+        except Exception:
+            attempt = attempt + 1
 
     return None
+
 
 def get_gen_row_data_dict(
     row: tuple, gen_func: dict[str, Callable]
@@ -169,13 +167,13 @@ def get_gen_row_data_dict(
     row : tuple
         Features which we want to generate synonyms for
     gen_func : dict[str, Callable]
-        Dictionary where the key represents the feature and 
+        Dictionary where the key represents the feature and
         the value represents the function used to generate the synonyms
 
     Returns
     -------
     dict[str, list[str]]
-        Dictionary where the key represents the feature and 
+        Dictionary where the key represents the feature and
         the value represents list of strings represents the generated synonyms
 
     See Also
@@ -200,23 +198,27 @@ def get_gen_row_data_dict(
     return gen_row_data_dict
 
 
-def main():
+def generate(schema_df: pd.DataFrame) -> pd.DataFrame:
+    """Generate synthetic data from schema features
+    Parameters:
+    ----------
+    schema_df : pd.DataFrame
+        target schema info which is used to generate synthetic data
+    Returns:
+    -------
+    pd.DataFrame
+        DataFrame containing synthetic data generated from schema features.
+    """
     gen_func = {
-        'field_name': field_name_gen_openai,
-        'field_description': field_desc_gen_openai
+        "field_name": field_name_gen_openai,
+        "field_description": field_desc_gen_openai,
     }
 
     # used to store synthetic data based on features in gen_func
-    gen_data_dict = {
-        'reference_field_name': []
-    }
+    gen_data_dict = {"reference_field_name": []}
     for key in gen_func.keys():
         gen_data_dict[key] = []
 
-    # get target schema info which is used to generate synthetic data
-    schema_df = get_schema_features(os.path.abspath(
-        os.path.join(os.path.dirname( __file__ ), '..', '..', TARGET_LINKML_PATH)
-    ))
     for row in schema_df.itertuples(index=False):
         # generate synonyms for a single row in the data frame and
         # store synthetic data inside a dictionary
@@ -224,16 +226,13 @@ def main():
 
         # proceed if data is correctly generated
         if len(gen_row_data_dict) == len(gen_func.keys()):
-
             for key, val in gen_row_data_dict.items():
                 # add synthetic data to data dict
-                gen_data_dict[key] = (
-                    gen_data_dict[key] + val
-                )
+                gen_data_dict[key] = gen_data_dict[key] + val
 
             # reference_field_name represents the field used to generate the data
-            gen_data_dict['reference_field_name'] = (
-                gen_data_dict['reference_field_name'] + [getattr(row, 'field_name')]*7
+            gen_data_dict["reference_field_name"] = (
+                gen_data_dict["reference_field_name"] + [getattr(row, "field_name")] * 7
             )
 
         # TODO: log issue with generating data
@@ -241,10 +240,28 @@ def main():
             pass
 
     synthetic = pd.DataFrame.from_dict(gen_data_dict)
-    save_path = os.path.abspath(os.path.join(
-        os.path.dirname( __file__ ), '..', '..', '..', 'data', '2_interim', 'synthetic_data.csv'
-    ))
-    synthetic.to_csv(save_path, index=False)
+    return synthetic
 
-if __name__=="__main__":
+
+def main():
+    target_linkml_path = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "..", "..", TARGET_LINKML_PATH)
+    )
+    schema_df = get_schema_features(target_linkml_path)
+    synth_path = os.path.abspath(
+        os.path.join(
+            os.path.dirname(__file__),
+            "..",
+            "..",
+            "..",
+            "data",
+            "2_interim",
+            "synthetic_data.csv",
+        )
+    )
+    synthetic = generate(schema_df)
+    synthetic.to_csv(synth_path, index=False)
+
+
+if __name__ == "__main__":
     main()
