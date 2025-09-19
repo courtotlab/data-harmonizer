@@ -1,7 +1,7 @@
 [project]
 name = "data-harmonizer"
 version = "0.1.0"
-description = "Add your description here"
+description = "A tool for harmonizing data dictionaries in LinkML format"
 readme = "README.md"
 authors = [
     { name = "Ryan Seeto", email = "ryan.seeto@alumni.utoronto.ca" },

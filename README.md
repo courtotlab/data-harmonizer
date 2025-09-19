@@ -1,22 +1,26 @@
 # Data Harmonizer
 ## Project Organization Summary
-    ├── .env
+    ├── .env <- configure your environment here
     ├── .gitignore
     ├── README.md
-    ├── requirements.txt
+    ├── pyproject.toml <- project definition
+    ├── uv.lock 
     ├── data
     │   ├── 1_raw
     │   ├── 2_interim
     │   └── 3_processed
-    ├── data_harmonizer
-    │   ├── data
-    │   │   ├── schema_data.py
-    │   │   ├── split_data.py
-    │   │   └── synthetic_data.py
-    │   ├── modeling
-    │   │   └── train.py
-    │   ├── __init__.py
-    │   └── main.py
+    ├── src
+    │   └── data_harmonizer
+    │       ├── cli
+    │       │   └── cli.py <- command line interface
+    │       ├── data
+    │       │   ├── schema_data.py
+    │       │   ├── split_data.py
+    │       │   └── synthetic_data.py
+    │       ├── modeling
+    │       │   └── train.py <- training
+    │       ├── __init__.py
+    │       └── main.py <- inference
     ├── logs
     ├── models
     └── tests
@@ -28,16 +32,27 @@
 ## Description
 This project attempts to map fields in a source database to a target database using features extracted from a LinkML schema file.
 
-## Set-up
+## Use as command line app
+### Installation 
+Install the command-line tool with uv:
+```bash
+uv tool install data-harmonizer
+```
+### Usage
+```bash
+data-harmonizer train /path/to/target_linkml.yml -o /path/to/output/
+
+data-harmonizer predict /path/to/target_linkml.yml /path/to/source_linkml.yml /path/to/output/model.ckpt -o /path/to/output
+```
+
+## Manual setup
 1. Save the project to your local drive.
 2. Obtain a API token for [ChatGPT](https://openai.com/api/). Put the API token into the `.env` file under `OPENAI_API_KEY` variable.
 3. Put the target LinkML file in `data/1_raw/` folder and name it `target_linkml.yaml`. Alternatively, change the path in the path of the target database using the `.env` file.
 3. Run `synthetic_data.py`. This script will take the extracted features from the `target_linkml.yaml` file and create synonyms using ChatGPT.
 4. Run `split_data.py`. This script will create a triplet data set from the created synthetic data.
 5. Run `train.py`. This script will use the data set and train a Triplet neural network.
-
-## Usage
-Put the source LinkML file in `data/1_raw/` folder and name it `source_linkml.yaml`. Alternatively, change the path in the path of the target database using the `.env` file. Run `main.py`
+6. Put the source LinkML file in `data/1_raw/` folder and name it `source_linkml.yaml`. Alternatively, change the path in the path of the target database using the `.env` file. Run `main.py`
 
 ## Background
 Below is a diagram explaining how the process works:
